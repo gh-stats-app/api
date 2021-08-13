@@ -1,0 +1,55 @@
+package app.ghstats.api.actions;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
+import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.BodyInserters;
+
+import java.util.Map;
+
+@ExtendWith(SpringExtension.class)
+@WebFluxTest(controllers = ActionsController.class)
+@Import(value = {ActionsConfiguration.class, R2dbcAutoConfiguration.class, FlywayAutoConfiguration.class})
+class ActionsControllerTest {
+
+    @Autowired
+    private WebTestClient webClient;
+
+    @Test
+    @DisplayName("should be able to mark action")
+    void markAction() {
+        // given
+        Map<String, String> request = Map.of(
+                "repository", "repositoryName",
+                "action", "actionName"
+        );
+
+        // expect
+        webClient.post()
+                .uri("/actions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(request))
+                .exchange()
+                .expectStatus()
+                .isCreated();
+    }
+
+    @Test
+    @DisplayName("should be able to mark action using bash")
+    void getBash() {
+        // expect
+        webClient.get()
+                .uri("/actions/bash")
+                .exchange()
+                .expectStatus()
+                .isOk();
+    }
+}
