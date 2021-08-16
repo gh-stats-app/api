@@ -3,3 +3,8 @@ spring:
     url: r2dbc:h2:file:///./build/test
   flyway:
     url: jdbc:h2:file:./build/test
+
+server:
+  error:
+    whitelabel:
+      enabled: false
