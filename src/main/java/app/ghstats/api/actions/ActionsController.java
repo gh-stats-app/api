@@ -45,7 +45,7 @@ class ActionsController {
     public Mono<ResponseEntity<String>> sha512() {
         return Mono.just(ResponseEntity.ok()
                 .header(CACHE_CONTROL, CacheControl.maxAge(Duration.ofDays(7)).cachePublic().getHeaderValue())
-                .body("9edc6eb3e0bd61b0a5db88a19cb4c3eb17fc92408c705e01a7b64d3c05a29ba6688cf24d6ba38ee0afe766cba264788e454436e4a2feb35e10765e7934c4f7fb"));
+                .body("b505b69ef70dede48573543a267ad75bb954b37c9ae1b961bcf8eea9f44b3f01f2884a1351b3fde51c1f4f8e1efc8e500a70d23195accf629cb708d541ff2c4a"));
     }
 
     @PostMapping
