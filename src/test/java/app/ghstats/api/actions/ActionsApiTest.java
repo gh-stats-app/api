@@ -18,7 +18,7 @@ import java.util.Map;
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = ActionsController.class)
 @Import(value = {ActionsConfiguration.class, R2dbcAutoConfiguration.class, FlywayAutoConfiguration.class})
-class ActionsControllerTest {
+class ActionsApiTest {
 
     @Autowired
     private WebTestClient webClient;

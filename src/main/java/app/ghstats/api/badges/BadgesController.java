@@ -2,6 +2,7 @@ package app.ghstats.api.badges;
 
 import app.ghstats.api.actions.ActionsQuery;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,24 +17,25 @@ import java.util.Map;
 @RequestMapping("/badge")
 class BadgesController {
 
-    private final ActionsQuery actionsStatsQuery;
+    private final ActionsQuery actionsQuery;
     private final WebClient webClient;
 
-    BadgesController(ActionsQuery actionsStatsQuery) {
-        this.actionsStatsQuery = actionsStatsQuery;
+    BadgesController(ActionsQuery actionsQuery) {
+        this.actionsQuery = actionsQuery;
         this.webClient = WebClient.builder().build();
     }
 
     @RequestMapping
-    public Mono<String> actionBadge(@RequestParam("action") String actionId, @RequestParam(value = "color", defaultValue = "brightgreen") String color) {
-        return actionsStatsQuery
+    public Mono<ResponseEntity<String>> actionBadge(@RequestParam("action") String actionId, @RequestParam(value = "color", defaultValue = "brightgreen") String color) {
+        return actionsQuery
                 .getUsage(actionId)
-                .map(usage -> webClient.get()
-                        .uri(getBadgeUrl(color, usage))
-                        .header(HttpHeaders.CACHE_CONTROL, "public, max-age 60")
+                .map(usage -> webClient.get().uri(getBadgeUrl(color, usage)).header(HttpHeaders.USER_AGENT, "gh-stats.app").retrieve())
+                .flatMap(it -> it.bodyToMono(String.class))
+                .map(svg -> ResponseEntity.ok()
+                        .header(HttpHeaders.CACHE_CONTROL, "max-age=60, public")
                         .header(HttpHeaders.CONTENT_TYPE, "image/svg+xml")
-                        .retrieve())
-                .flatMap(it -> it.bodyToMono(String.class));
+                        .body(svg)
+                );
     }
 
     private URI getBadgeUrl(String color, Long usage) {
