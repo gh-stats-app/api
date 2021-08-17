@@ -35,8 +35,8 @@ class ActionsApiTest {
     void markAction() {
         // given
         Map<String, String> request = Map.of(
-                "repository", "repositoryName",
-                "action", "actionName"
+                "repository", "bgalek/repository",
+                "action", "actions/checkout"
         );
 
         // expect

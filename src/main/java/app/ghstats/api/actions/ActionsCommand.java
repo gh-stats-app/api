@@ -1,6 +1,7 @@
 package app.ghstats.api.actions;
 
 import app.ghstats.api.domain.ActionId;
+import app.ghstats.api.domain.ReporterId;
 import app.ghstats.api.domain.RepositoryName;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.r2dbc.core.DatabaseClient;
@@ -16,11 +17,12 @@ public class ActionsCommand {
         this.meterRegistry = meterRegistry;
     }
 
-    Mono<Boolean> markAction(ActionId id, RepositoryName repository) {
+    Mono<Boolean> markAction(ActionId id, RepositoryName repository, ReporterId reporterId) {
         meterRegistry.counter(id.value()).increment();
-        return databaseClient.sql("INSERT INTO `stats` (`repository`, `action`) VALUES (?, ?)")
-                .bind(0, repository)
-                .bind(1, id)
+        return databaseClient.sql("INSERT INTO `stats` (`repository`, `action`, `reporter`) VALUES (?, ?, ?)")
+                .bind(0, repository.value())
+                .bind(1, id.value())
+                .bind(2, reporterId.value())
                 .fetch()
                 .rowsUpdated()
                 .map(it -> 1 == it);
