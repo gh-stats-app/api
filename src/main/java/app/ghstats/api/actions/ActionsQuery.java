@@ -16,10 +16,20 @@ public class ActionsQuery {
     }
 
     public Mono<Long> getUsage(ActionId actionId) {
-        System.out.println(meterRegistry.counter(actionId.value()).count());
+        ;
         return databaseClient.sql("SELECT COUNT(DISTINCT(repository)) FROM `stats` WHERE action LIKE ?")
-                .bind(0, actionId.value())
+                .bind(0, PersistedActionId.valueOf(actionId).value())
                 .map(it -> it.get(0, Long.class))
                 .first();
+    }
+
+    private record PersistedActionId(String value) {
+        static PersistedActionId valueOf(ActionId actionId) {
+            return new PersistedActionId(actionId.value());
+        }
+
+        public String value() {
+            return "__%s".formatted(value.replaceFirst("/", "_"));
+        }
     }
 }
