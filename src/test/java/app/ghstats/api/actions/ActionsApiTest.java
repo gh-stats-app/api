@@ -1,5 +1,6 @@
 package app.ghstats.api.actions;
 
+import app.ghstats.api.domain.ActionId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +23,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Objects;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = ActionsController.class)
 @Import(value = {ActionsConfiguration.class, R2dbcAutoConfiguration.class, FlywayAutoConfiguration.class})
@@ -30,13 +33,16 @@ class ActionsApiTest {
     @Autowired
     private WebTestClient webClient;
 
+    @Autowired
+    private ActionsQuery actionsQuery;
+
     @Test
     @DisplayName("should be able to mark action")
     void markAction() {
         // given
         Map<String, String> request = Map.of(
                 "repository", "bgalek/repository",
-                "action", "actions/checkout"
+                "action", "__allegro-actions_verify-configuration"
         );
 
         // expect
@@ -47,6 +53,8 @@ class ActionsApiTest {
                 .exchange()
                 .expectStatus()
                 .isCreated();
+        assertEquals(actionsQuery.getUsage(ActionId.valueOf("__allegro-actions_verify-configuration")).block(), 1L);
+        assertEquals(actionsQuery.getUsage(ActionId.valueOf("allegro-actions/verify-configuration")).block(), 1L);
     }
 
     @Test

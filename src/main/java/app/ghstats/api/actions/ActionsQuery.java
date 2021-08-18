@@ -1,5 +1,6 @@
 package app.ghstats.api.actions;
 
+import app.ghstats.api.domain.ActionId;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.r2dbc.core.DatabaseClient;
 import reactor.core.publisher.Mono;
@@ -14,10 +15,10 @@ public class ActionsQuery {
         this.meterRegistry = meterRegistry;
     }
 
-    public Mono<Long> getUsage(String actionId) {
-        System.out.println(meterRegistry.counter(actionId).count());
+    public Mono<Long> getUsage(ActionId actionId) {
+        System.out.println(meterRegistry.counter(actionId.value()).count());
         return databaseClient.sql("SELECT COUNT(DISTINCT(repository)) FROM `stats` WHERE action LIKE ?")
-                .bind(0, actionId)
+                .bind(0, actionId.value())
                 .map(it -> it.get(0, Long.class))
                 .first();
     }

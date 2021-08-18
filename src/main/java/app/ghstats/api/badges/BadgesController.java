@@ -1,6 +1,7 @@
 package app.ghstats.api.badges;
 
 import app.ghstats.api.actions.ActionsQuery;
+import app.ghstats.api.domain.ActionId;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,7 @@ class BadgesController {
     }
 
     @GetMapping
-    public Mono<ResponseEntity<String>> actionBadge(@RequestParam("action") String actionId, ServerHttpRequest request) {
+    public Mono<ResponseEntity<String>> actionBadge(@RequestParam("action") ActionId actionId, ServerHttpRequest request) {
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>(request.getQueryParams());
         queryParams.remove("action");
         return actionsQuery
