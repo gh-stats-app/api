@@ -34,6 +34,7 @@ dependencies {
     runtimeOnly("org.mariadb:r2dbc-mariadb:1.0.2")
     runtimeOnly("io.r2dbc:r2dbc-h2")
 
+    testImplementation("org.flywaydb:flyway-core")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 

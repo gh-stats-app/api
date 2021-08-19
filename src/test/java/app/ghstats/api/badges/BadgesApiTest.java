@@ -35,7 +35,7 @@ class BadgesApiTest {
     @DisplayName("should return badge in svg format with cache for 60 min")
     void testBadge() {
         // given
-        Mockito.when(actionsQuery.getUsage(ActionId.valueOf("bgalek/test-action"))).thenReturn(Mono.just(10L));
+        Mockito.when(actionsQuery.getUsageCount(ActionId.valueOf("bgalek/test-action"))).thenReturn(Mono.just(10L));
 
         // expect
         webClient.get()

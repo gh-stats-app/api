@@ -38,7 +38,7 @@ class BadgesController {
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>(request.getQueryParams());
         queryParams.remove("action");
         return actionsQuery
-                .getUsage(actionId)
+                .getUsageCount(actionId)
                 .map(usage -> webClient.get().uri(getBadgeUrl(usage, queryParams)).header(HttpHeaders.USER_AGENT, "gh-stats.app").retrieve())
                 .flatMap(it -> it.bodyToMono(String.class))
                 .map(svg -> ResponseEntity.ok()

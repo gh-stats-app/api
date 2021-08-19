@@ -10,8 +10,8 @@ import org.springframework.r2dbc.core.DatabaseClient;
 class ActionsConfiguration {
 
     @Bean
-    ActionsQuery actionsQuery(DatabaseClient databaseClient, MeterRegistry meterRegistry) {
-        return new ActionsQuery(databaseClient, meterRegistry);
+    ActionsQuery actionsQuery(DatabaseClient databaseClient) {
+        return new ActionsQuery(databaseClient);
     }
 
     @Bean

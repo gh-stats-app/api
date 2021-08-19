@@ -17,11 +17,11 @@ public class ActionsCommand {
         this.meterRegistry = meterRegistry;
     }
 
-    Mono<Boolean> markAction(ActionId id, RepositoryName repository, ReporterId reporterId) {
-        meterRegistry.counter(id.value()).increment();
+    Mono<Boolean> markAction(ActionId actionId, RepositoryName repository, ReporterId reporterId) {
+        meterRegistry.counter(actionId.toString()).increment();
         return databaseClient.sql("INSERT INTO `stats` (`repository`, `action`, `reporter`) VALUES (?, ?, ?)")
                 .bind(0, repository.value())
-                .bind(1, id.value())
+                .bind(1, actionId.serialize())
                 .bind(2, reporterId.value())
                 .fetch()
                 .rowsUpdated()
