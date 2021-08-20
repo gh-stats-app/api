@@ -33,7 +33,7 @@ class ActionsController {
     @PostMapping
     public Mono<ResponseEntity<Void>> markActionUsage(@RequestBody MarkActionRequest markActionRequest,
                                                       @RequestHeader(name = "x-reporter", defaultValue = "unknown") ReporterId reporterId) {
-        return actionsCommand.markAction(ActionId.valueOf(markActionRequest.action()), RepositoryName.valueOf(markActionRequest.repository()), reporterId).map(it -> {
+        return actionsCommand.markAction(ActionId.fromGithubString(markActionRequest.action()), RepositoryName.valueOf(markActionRequest.repository()), reporterId).map(it -> {
             if (it) return ResponseEntity.status(HttpStatus.CREATED).build();
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         });

@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
@@ -34,6 +35,9 @@ class ActionsApiTest {
 
     @Autowired
     private Flyway flyway;
+
+    @Autowired
+    DatabaseClient databaseClient;
 
     @BeforeEach
     void initTest() {
@@ -61,5 +65,11 @@ class ActionsApiTest {
         //then
         response.expectStatus().isCreated();
         assertEquals(1L, actionsQuery.getUsageCount(ActionId.valueOf("allegro-actions/verify-configuration")).block());
+
+        Map<String, Object> dbRecord = databaseClient.sql("SELECT * FROM `stats`").fetch().all().blockFirst();
+        assertEquals(1, dbRecord.get("ID"));
+        assertEquals("bgalek/repository", dbRecord.get("REPOSITORY"));
+        assertEquals("allegro-actions/verify-configuration", dbRecord.get("ACTION"));
+        assertEquals("tests", dbRecord.get("REPORTER"));
     }
 }
