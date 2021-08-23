@@ -7,16 +7,22 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.r2dbc.core.DatabaseClient;
 
 @Configuration
+public
 class ActionsConfiguration {
 
     @Bean
-    ActionsQuery actionsQuery(DatabaseClient databaseClient) {
-        return new ActionsQuery(databaseClient);
+    ActionsRepository actionsRepository(DatabaseClient databaseClient) {
+        return new SqlActionsRepository(databaseClient);
     }
 
     @Bean
-    ActionsCommand actionsCommand(DatabaseClient databaseClient, MeterRegistry meterRegistry) {
-        return new ActionsCommand(databaseClient, meterRegistry);
+    ActionsQuery actionsQuery(ActionsRepository actionsRepository) {
+        return new ActionsQuery(actionsRepository);
+    }
+
+    @Bean
+    ActionsCommand actionsCommand(ActionsRepository actionsRepository, MeterRegistry meterRegistry) {
+        return new ActionsCommand(actionsRepository, meterRegistry);
     }
 
     @Bean

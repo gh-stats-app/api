@@ -1,4 +1,4 @@
-package app.ghstats.api.actions;
+package app.ghstats.api.actions.web;
 
 import com.google.common.net.HttpHeaders;
 import org.springframework.core.io.ResourceLoader;

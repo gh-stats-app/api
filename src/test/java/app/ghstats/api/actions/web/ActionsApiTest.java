@@ -1,6 +1,8 @@
-package app.ghstats.api.actions;
+package app.ghstats.api.actions.web;
 
-import app.ghstats.api.domain.ActionId;
+import app.ghstats.api.actions.ActionsConfiguration;
+import app.ghstats.api.actions.ActionsQuery;
+import app.ghstats.api.actions.api.ActionId;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -1,4 +1,4 @@
-package app.ghstats.api.domain;
+package app.ghstats.api.actions.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 

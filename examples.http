@@ -1,0 +1,54 @@
+POST http://localhost:8080/achievements
+Content-Type: application/json
+
+{
+  "commits": [
+    {
+      "id": "e21ee9533fd696f095525826773ed4642a8adcc4",
+      "tree_id": "f03d75ee524d8dd9e228a48918ff8619e0d20f52",
+      "distinct": true,
+      "message": "that was awesome! wow!",
+      "timestamp": "2021-08-21T19:02:29+02:00",
+      "url": "https://github.com/example/gh-events-test/commit/e21ee9533fd696f095525826773ed4642a8adcc4",
+      "author": {
+        "name": "Bartosz Gałek",
+        "email": "bartosz@github.com",
+        "username": "bgalek"
+      },
+      "committer": {
+        "name": "GitHub",
+        "email": "noreply@github.com",
+        "username": "web-flow"
+      },
+      "added": [
+        "my-file.txt"
+      ],
+      "removed": [],
+      "modified": []
+    },
+    {
+      "id": "e21ee9533fd696f095525826773ed4642a8adcc4",
+      "tree_id": "f03d75ee524d8dd9e228a48918ff8619e0d20f52",
+      "distinct": true,
+      "message": "look at this! https://stackoverflow.com/questions/58978061/mono-to-flux",
+      "timestamp": "2021-08-21T19:02:29+02:00",
+      "url": "https://github.com/bgalek/gh-events-test/commit/e21ee9533fd696f095525826773ed4642a8adcc4",
+      "author": {
+        "name": "Bartosz Gałek",
+        "email": "bartosz@github.com",
+        "username": "bgalek"
+      },
+      "committer": {
+        "name": "GitHub",
+        "email": "noreply@github.com",
+        "username": "web-flow"
+      },
+      "added": [],
+      "removed": [],
+      "modified": []
+    }
+  ]
+}
+
+###
+

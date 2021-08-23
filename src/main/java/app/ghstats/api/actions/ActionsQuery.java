@@ -1,7 +1,6 @@
 package app.ghstats.api.actions;
 
-import app.ghstats.api.domain.ActionId;
-import org.springframework.r2dbc.core.DatabaseClient;
+import app.ghstats.api.actions.api.ActionId;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -9,30 +8,21 @@ import java.time.LocalDateTime;
 
 public class ActionsQuery {
 
-    private final DatabaseClient databaseClient;
+    private final ActionsRepository actionsRepository;
 
-    public ActionsQuery(DatabaseClient databaseClient) {
-        this.databaseClient = databaseClient;
+    public ActionsQuery(ActionsRepository actionsRepository) {
+        this.actionsRepository = actionsRepository;
     }
 
     public Mono<Long> getUsageCount(ActionId actionId) {
-        return databaseClient.sql("SELECT COUNT(id) FROM `stats` WHERE action LIKE ?")
-                .bind(0, actionId.serialize())
-                .map(it -> it.get(0, Long.class))
-                .first();
+        return actionsRepository.getUsageCount(actionId);
     }
 
     public Mono<Long> getRepositoriesCount(ActionId actionId) {
-        return databaseClient.sql("SELECT COUNT(DISTINCT(repository)) FROM `stats` WHERE action LIKE ?")
-                .bind(0, actionId.serialize())
-                .map(it -> it.get(0, Long.class))
-                .first();
+        return actionsRepository.getUsedByRepositoriesCount(actionId);
     }
 
     public Flux<LocalDateTime> getLastUsages(ActionId actionId) {
-        return databaseClient.sql("SELECT * FROM `stats` WHERE action LIKE ? ORDER BY created_at DESC LIMIT 10")
-                .bind(0, actionId.serialize())
-                .map(it -> it.get("created_at", LocalDateTime.class))
-                .all();
+        return actionsRepository.getLastUsages(actionId);
     }
 }

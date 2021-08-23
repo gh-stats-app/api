@@ -26,6 +26,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
     implementation("io.micrometer:micrometer-core:1.7.3")
     implementation("com.google.guava:guava:30.1.1-jre")
+    implementation("com.github.slugify:slugify:2.4")
 
     runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")
     runtimeOnly("mysql:mysql-connector-java")

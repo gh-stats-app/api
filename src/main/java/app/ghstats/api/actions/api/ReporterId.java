@@ -1,4 +1,4 @@
-package app.ghstats.api.domain;
+package app.ghstats.api.actions.api;
 
 public record ReporterId(String value) {
     public static ReporterId valueOf(String action) {

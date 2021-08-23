@@ -1,5 +1,6 @@
-package app.ghstats.api.actions;
+package app.ghstats.api.actions.web;
 
+import app.ghstats.api.actions.web.BashController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

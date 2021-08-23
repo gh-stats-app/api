@@ -1,4 +1,4 @@
-package app.ghstats.api.domain;
+package app.ghstats.api.actions.api;
 
 public record ActionId(Owner user, ActionName name) {
 

@@ -1,9 +1,10 @@
-package app.ghstats.api.actions;
+package app.ghstats.api.actions.web;
 
-import app.ghstats.api.domain.ActionId;
-import app.ghstats.api.domain.ReporterId;
-import app.ghstats.api.domain.RepositoryName;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import app.ghstats.api.actions.ActionsCommand;
+import app.ghstats.api.actions.ActionsQuery;
+import app.ghstats.api.actions.api.ActionId;
+import app.ghstats.api.actions.api.ReporterId;
+import app.ghstats.api.actions.api.RepositoryName;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,11 +43,5 @@ class ActionsController {
     @GetMapping("/{user}/{actionName}")
     public Mono<ResponseEntity<List<LocalDateTime>>> getActionStats(@PathVariable ActionId.Owner user, @PathVariable ActionId.ActionName actionName) {
         return actionsQuery.getLastUsages(ActionId.valueOf(user, actionName)).collectList().map(ResponseEntity::ok);
-    }
-
-    static record MarkActionRequest(
-            @JsonProperty("repository") String repository,
-            @JsonProperty("action") String action
-    ) {
     }
 }
