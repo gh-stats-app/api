@@ -1,6 +1,7 @@
 package app.ghstats.api.achievements;
 
 import app.ghstats.api.achievements.api.Achievement;
+import app.ghstats.api.notifications.NotificationsCommand;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.r2dbc.core.DatabaseClient;
@@ -21,7 +22,9 @@ class AchievementsConfiguration {
     }
 
     @Bean
-    AchievementsCommand achievementsCommand(List<Achievement> achievements, AchievementsRepository achievementsRepository) {
-        return new AchievementsCommand(achievements, achievementsRepository);
+    AchievementsCommand achievementsCommand(List<Achievement> achievements,
+                                            AchievementsRepository achievementsRepository,
+                                            NotificationsCommand notificationsCommand) {
+        return new AchievementsCommand(achievements, achievementsRepository, notificationsCommand);
     }
 }
