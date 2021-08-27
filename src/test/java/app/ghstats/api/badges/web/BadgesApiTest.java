@@ -3,6 +3,9 @@ package app.ghstats.api.badges.web;
 import app.ghstats.api.actions.ActionsQuery;
 import app.ghstats.api.actions.api.ActionId;
 import app.ghstats.api.badges.BadgesConfiguration;
+import app.ghstats.api.badges.BadgesQuery;
+import app.ghstats.api.services.github.GithubConfiguration;
+import app.ghstats.api.services.shields.ShieldsConfiguration;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +26,7 @@ import java.time.Duration;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = BadgesController.class)
-@Import(value = {BadgesConfiguration.class, R2dbcAutoConfiguration.class, FlywayAutoConfiguration.class})
+@Import(value = {BadgesConfiguration.class, R2dbcAutoConfiguration.class, FlywayAutoConfiguration.class, ShieldsConfiguration.class, GithubConfiguration.class})
 class BadgesApiTest {
 
     @Autowired

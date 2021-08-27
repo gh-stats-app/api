@@ -44,5 +44,4 @@ class AchievementsController {
                 .publishOn(Schedulers.fromExecutor(Executors.newSingleThreadExecutor()))
                 .thenReturn(ResponseEntity.accepted().build());
     }
-
 }

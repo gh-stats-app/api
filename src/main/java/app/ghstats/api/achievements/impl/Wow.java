@@ -25,11 +25,6 @@ class Wow implements Achievement {
     }
 
     @Override
-    public String getImage() {
-        return "wow.png";
-    }
-
-    @Override
     public Optional<AchievementUnlocked> check(List<GitCommit> commits) {
         return commits.stream()
                 .filter(it -> WOW_PATTERN.matcher(it.message()).find())

@@ -2,40 +2,34 @@ package app.ghstats.api.badges;
 
 import app.ghstats.api.actions.ActionsQuery;
 import app.ghstats.api.actions.api.ActionId;
-import org.springframework.http.HttpHeaders;
+import app.ghstats.api.services.github.GithubClient;
+import app.ghstats.api.services.shields.ShieldsClient;
+import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
-import java.net.URI;
-import java.util.Map;
-
 public class BadgesQuery {
-    private final ActionsQuery actionsQuery;
-    private final WebClient webClient;
 
-    public BadgesQuery(ActionsQuery actionsQuery, WebClient webClient) {
+    private final ActionsQuery actionsQuery;
+    private final ShieldsClient shieldsClient;
+    private final GithubClient githubClient;
+
+    public BadgesQuery(ActionsQuery actionsQuery, ShieldsClient shieldsClient, GithubClient githubClient) {
         this.actionsQuery = actionsQuery;
-        this.webClient = webClient;
+        this.shieldsClient = shieldsClient;
+        this.githubClient = githubClient;
     }
 
     public Mono<String> getActionsBadge(ActionId actionId, String color, MultiValueMap<String, String> queryParams) {
         return actionsQuery
                 .getUsageCount(actionId)
-                .map(usage -> queryShieldsIo(color, queryParams, usage))
-                .flatMap(it -> it.bodyToMono(String.class));
-
+                .flatMap(usage -> shieldsClient.getShield("Used ", "%d times".formatted(usage), color, queryParams));
     }
 
-    private WebClient.ResponseSpec queryShieldsIo(String color, MultiValueMap<String, String> queryParams, Long usage) {
-        URI target = UriComponentsBuilder
-                .fromHttpUrl("https://img.shields.io/badge/{label}-{message}-{color}")
-                .queryParams(queryParams)
-                .buildAndExpand(Map.of("label", "Used ", "message", "%d times".formatted(usage), "color", color))
-                .toUri();
-        return webClient.get().uri(target)
-                .header(HttpHeaders.USER_AGENT, "gh-stats.app")
-                .retrieve();
+    public Mono<String> getUserBadge(String user, String color, MultiValueMap<String, String> queryParams) {
+        return githubClient
+                .getLastCommitDate(user)
+                .map(dateTime -> new PrettyTime().format(dateTime))
+                .flatMap(lastCommitDateString -> shieldsClient.getShield("Last commit:", lastCommitDateString, color, queryParams));
     }
 }

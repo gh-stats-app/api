@@ -1,7 +1,7 @@
 package app.ghstats.api.achievements;
 
 import app.ghstats.api.achievements.api.Achievement;
-import app.ghstats.api.notifications.NotificationsCommand;
+import app.ghstats.api.services.slack.SlackClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.r2dbc.core.DatabaseClient;
@@ -17,14 +17,9 @@ class AchievementsConfiguration {
     }
 
     @Bean
-    AchievementsQuery achievementsQuery(DatabaseClient databaseClient) {
-        return new AchievementsQuery(databaseClient);
-    }
-
-    @Bean
     AchievementsCommand achievementsCommand(List<Achievement> achievements,
                                             AchievementsRepository achievementsRepository,
-                                            NotificationsCommand notificationsCommand) {
-        return new AchievementsCommand(achievements, achievementsRepository, notificationsCommand);
+                                            SlackClient slackClient) {
+        return new AchievementsCommand(achievements, achievementsRepository, slackClient);
     }
 }

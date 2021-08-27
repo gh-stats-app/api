@@ -9,17 +9,17 @@ public interface Achievement {
 
     Slugify SLUGIFY = new Slugify();
 
-    default String getId() {
-        return SLUGIFY.slugify(getName());
-    }
-
     String getName();
 
     String getDescription();
 
-    default String getImage() {
-        return "default.png";
+    Optional<AchievementUnlocked> check(List<GitCommit> commits);
+
+    default String getId() {
+        return SLUGIFY.slugify(getName());
     }
 
-    Optional<AchievementUnlocked> check(List<GitCommit> commits);
+    default String getImage() {
+        return "%s@6x.png".formatted(SLUGIFY.slugify(getId()));
+    }
 }

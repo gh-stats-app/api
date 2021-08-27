@@ -2,7 +2,7 @@ package app.ghstats.api.achievements;
 
 import app.ghstats.api.achievements.api.Achievement;
 import app.ghstats.api.achievements.api.GitCommit;
-import app.ghstats.api.notifications.NotificationsCommand;
+import app.ghstats.api.services.slack.SlackClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -13,16 +13,16 @@ public class AchievementsCommand {
 
     private final List<Achievement> achievements;
     private final AchievementsRepository achievementsRepository;
-    private final NotificationsCommand notificationsCommand;
+    private final SlackClient slackClient;
 
     public AchievementsCommand(
             List<Achievement> achievements,
             AchievementsRepository achievementsRepository,
-            NotificationsCommand notificationsCommand
+            SlackClient slackClient
     ) {
         this.achievements = achievements;
         this.achievementsRepository = achievementsRepository;
-        this.notificationsCommand = notificationsCommand;
+        this.slackClient = slackClient;
     }
 
     public Mono<Integer> analyseCommit(List<GitCommit> commits) {
@@ -31,7 +31,7 @@ public class AchievementsCommand {
                         .check(commits)
                         .map(achievementUnlocked -> Mono.zip(
                                 achievementsRepository.saveAchievement(achievement.getId(), achievementUnlocked),
-                                notificationsCommand.slackMessage("%s by %s".formatted(achievement.getDescription(), achievementUnlocked.userName())),
+                                slackClient.sendMessage(achievement, achievementUnlocked.userName()),
                                 (integer, unused) -> integer))
                         .orElseGet(() -> Mono.just(0)))
                 .collect(Collectors.toList());

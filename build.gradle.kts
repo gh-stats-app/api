@@ -27,6 +27,7 @@ dependencies {
     implementation("io.micrometer:micrometer-core:1.7.3")
     implementation("com.google.guava:guava:30.1.1-jre")
     implementation("com.github.slugify:slugify:2.4")
+    implementation("org.ocpsoft.prettytime:prettytime:5.0.1.Final")
 
     runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")
     runtimeOnly("mysql:mysql-connector-java")

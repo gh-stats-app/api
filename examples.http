@@ -8,7 +8,7 @@ Content-Type: application/json
       "tree_id": "f03d75ee524d8dd9e228a48918ff8619e0d20f52",
       "distinct": true,
       "message": "that was awesome! wow!",
-      "timestamp": "2021-08-21T19:02:29+02:00",
+      "timestamp": "2021-02-14T19:02:29+02:00",
       "url": "https://github.com/example/gh-events-test/commit/e21ee9533fd696f095525826773ed4642a8adcc4",
       "author": {
         "name": "Bartosz Gałek",

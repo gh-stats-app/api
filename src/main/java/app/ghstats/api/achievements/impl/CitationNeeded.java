@@ -5,7 +5,6 @@ import app.ghstats.api.achievements.api.AchievementUnlocked;
 import app.ghstats.api.achievements.api.GitCommit;
 import org.springframework.stereotype.Component;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,11 +19,6 @@ class CitationNeeded implements Achievement {
     @Override
     public String getDescription() {
         return "StackOverflow URL in a commit body or message";
-    }
-
-    @Override
-    public String getImage() {
-        return "wow.png";
     }
 
     @Override

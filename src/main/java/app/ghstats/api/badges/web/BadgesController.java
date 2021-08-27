@@ -26,7 +26,7 @@ class BadgesController {
         this.badgesQuery = badgesQuery;
     }
 
-    @GetMapping
+    @GetMapping(params = "action")
     public Mono<ResponseEntity<String>> actionBadge(@RequestParam("action") ActionId actionId,
                                                     @RequestParam(value = "color", defaultValue = "brightgreen") String color,
                                                     ServerHttpRequest request) {
@@ -34,6 +34,21 @@ class BadgesController {
         restQueryParams.remove("action");
         restQueryParams.remove("color");
         return badgesQuery.getActionsBadge(actionId, color, restQueryParams)
+                .map(svg -> ResponseEntity.ok()
+                        .header(HttpHeaders.CACHE_CONTROL, CacheControl.maxAge(Duration.ofSeconds(60)).cachePublic().getHeaderValue())
+                        .header(HttpHeaders.CONTENT_TYPE, "image/svg+xml")
+                        .body(svg)
+                );
+    }
+
+    @GetMapping(params = "user")
+    public Mono<ResponseEntity<String>> userBadge(@RequestParam("user") String user,
+                                                  @RequestParam(value = "color", defaultValue = "brightgreen") String color,
+                                                  ServerHttpRequest request) {
+        MultiValueMap<String, String> restQueryParams = new LinkedMultiValueMap<>(request.getQueryParams());
+        restQueryParams.remove("user");
+        restQueryParams.remove("color");
+        return badgesQuery.getUserBadge(user, color, restQueryParams)
                 .map(svg -> ResponseEntity.ok()
                         .header(HttpHeaders.CACHE_CONTROL, CacheControl.maxAge(Duration.ofSeconds(60)).cachePublic().getHeaderValue())
                         .header(HttpHeaders.CONTENT_TYPE, "image/svg+xml")

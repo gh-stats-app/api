@@ -9,6 +9,5 @@ server:
     whitelabel:
       enabled: false
 
-notifications:
-  slack:
-    webhook: https://webhook.site/94fd9d96-9d9d-43b7-82c7-40bc3db39e77
+slack:
+  webhook: https://webhook.site/94fd9d96-9d9d-43b7-82c7-40bc3db39e77
