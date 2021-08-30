@@ -36,7 +36,7 @@ public class SlackClient {
                                         "type", "section",
                                         "text", Map.of(
                                                 "type", "mrkdwn",
-                                                "text", "*Achievement unlocked by `<@%s>`!*\n\n>%s\n\n_%s_".formatted(author.userName(), achievement.getName(), achievement.getDescription())
+                                                "text", "Achievement *%s* unlocked by <@%s>!\n\n>%s (%s)\n\n:trophy: _%s_".formatted(achievement.getName(), author.userName(), achievementUnlocked.commit().message(), achievementUnlocked.commit().id(), achievement.getDescription())
                                         ),
                                         "accessory", Map.of(
                                                 "type", "image",
