@@ -23,7 +23,7 @@ class WorldBalance implements Achievement {
 
     @Override
     public String getDescription() {
-        return "Number of lines added == number of lines deleted";
+        return "Number of files added == number of files deleted";
     }
 
     @Override
