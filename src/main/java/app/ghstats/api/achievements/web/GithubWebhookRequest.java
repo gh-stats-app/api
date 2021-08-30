@@ -18,7 +18,9 @@ record GithubWebhookRequest(
             @JsonProperty("modified") List<String> modified
     ) {
         static record GithubAuthor(
-                @JsonProperty("username") String username
+                @JsonProperty("name") String name,
+                @JsonProperty("username") String username,
+                @JsonProperty("email") String email
         ) {
         }
     }

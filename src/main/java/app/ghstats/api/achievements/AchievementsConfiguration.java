@@ -1,6 +1,7 @@
 package app.ghstats.api.achievements;
 
 import app.ghstats.api.achievements.api.Achievement;
+import app.ghstats.api.notifications.NotificationsCommand;
 import app.ghstats.api.services.slack.SlackClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +20,12 @@ class AchievementsConfiguration {
     @Bean
     AchievementsCommand achievementsCommand(List<Achievement> achievements,
                                             AchievementsRepository achievementsRepository,
-                                            SlackClient slackClient) {
-        return new AchievementsCommand(achievements, achievementsRepository, slackClient);
+                                            NotificationsCommand notificationsCommand) {
+        return new AchievementsCommand(achievements, achievementsRepository, notificationsCommand);
+    }
+
+    @Bean
+    AchievementsQuery achievementsQuery(List<Achievement> achievements) {
+        return new AchievementsQuery(achievements);
     }
 }

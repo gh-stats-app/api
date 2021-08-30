@@ -5,7 +5,7 @@ import java.util.List;
 
 public record GitCommit(
         CommitId id,
-        UserName userName,
+        CommitAuthor author,
         String message,
         ZonedDateTime timestamp,
         List<String> added,

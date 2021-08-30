@@ -10,29 +10,29 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Component
-class Wow implements Achievement {
+class Beggar implements Achievement {
 
-    static final Pattern WOW_PATTERN = Pattern.compile("\\bwow\\b", Pattern.CASE_INSENSITIVE);
+    static final Pattern BEGGAR_PATTERN = Pattern.compile("\\bachievements?\\b", Pattern.CASE_INSENSITIVE);
 
     @Override
     public String getId() {
-        return "wow";
+        return "beggar";
     }
 
     @Override
     public String getName() {
-        return "Wow";
+        return "Beggar";
     }
 
     @Override
     public String getDescription() {
-        return "use word “wow” in a commit message";
+        return "Ask for an achievement in a commit message";
     }
 
     @Override
     public Optional<AchievementUnlocked> unlock(List<GitCommit> commits) {
         return commits.stream()
-                .filter(it -> WOW_PATTERN.matcher(it.message()).find())
+                .filter(it -> BEGGAR_PATTERN.matcher(it.message()).find())
                 .findFirst()
                 .map(commit -> new AchievementUnlocked(this, commit));
     }

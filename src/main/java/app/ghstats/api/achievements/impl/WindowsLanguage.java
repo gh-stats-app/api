@@ -14,6 +14,11 @@ import java.util.stream.Stream;
 class WindowsLanguage implements Achievement {
 
     @Override
+    public String getId() {
+        return "windows-language";
+    }
+
+    @Override
     public String getName() {
         return "You Can't Program on Windows, Can You?";
     }
@@ -24,12 +29,12 @@ class WindowsLanguage implements Achievement {
     }
 
     @Override
-    public Optional<AchievementUnlocked> check(List<GitCommit> commits) {
+    public Optional<AchievementUnlocked> unlock(List<GitCommit> commits) {
         return commits.stream()
                 .filter(it -> Stream.of(it.modified(), it.removed(), it.added())
                         .flatMap(Collection::stream)
                         .anyMatch(s -> s.endsWith(".bat") || s.endsWith(".ps1")))
                 .findAny()
-                .map(commit -> new AchievementUnlocked(commit.id(), commit.userName()));
+                .map(commit -> new AchievementUnlocked(this, commit));
     }
 }

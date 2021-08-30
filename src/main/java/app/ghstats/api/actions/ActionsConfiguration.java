@@ -1,5 +1,6 @@
 package app.ghstats.api.actions;
 
+import app.ghstats.api.notifications.NotificationsCommand;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.springframework.context.annotation.Bean;
@@ -21,8 +22,8 @@ class ActionsConfiguration {
     }
 
     @Bean
-    ActionsCommand actionsCommand(ActionsRepository actionsRepository, MeterRegistry meterRegistry) {
-        return new ActionsCommand(actionsRepository, meterRegistry);
+    ActionsCommand actionsCommand(ActionsRepository actionsRepository, NotificationsCommand notificationsCommand, MeterRegistry meterRegistry) {
+        return new ActionsCommand(actionsRepository, notificationsCommand, meterRegistry);
     }
 
     @Bean

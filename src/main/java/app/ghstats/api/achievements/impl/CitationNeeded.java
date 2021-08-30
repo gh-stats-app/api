@@ -12,6 +12,11 @@ import java.util.Optional;
 class CitationNeeded implements Achievement {
 
     @Override
+    public String getId() {
+        return "citation-needed";
+    }
+
+    @Override
     public String getName() {
         return "Citation Needed";
     }
@@ -22,10 +27,10 @@ class CitationNeeded implements Achievement {
     }
 
     @Override
-    public Optional<AchievementUnlocked> check(List<GitCommit> commits) {
+    public Optional<AchievementUnlocked> unlock(List<GitCommit> commits) {
         return commits.stream()
                 .filter(it -> it.message().toLowerCase().contains("stackoverflow.com/questions/"))
                 .findFirst()
-                .map(commit -> new AchievementUnlocked(commit.id(), commit.userName()));
+                .map(commit -> new AchievementUnlocked(this, commit));
     }
 }

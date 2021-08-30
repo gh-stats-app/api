@@ -12,6 +12,11 @@ import java.util.Optional;
 class ExactMatch implements Achievement {
 
     @Override
+    public String getId() {
+        return "time-get";
+    }
+
+    @Override
     public String getName() {
         return "Exact match";
     }
@@ -22,10 +27,10 @@ class ExactMatch implements Achievement {
     }
 
     @Override
-    public Optional<AchievementUnlocked> check(List<GitCommit> commits) {
+    public Optional<AchievementUnlocked> unlock(List<GitCommit> commits) {
         return commits.stream()
                 .filter(it -> it.timestamp().getHour() == 0 && it.timestamp().getMinute() == 0)
                 .findAny()
-                .map(commit -> new AchievementUnlocked(commit.id(), commit.userName()));
+                .map(commit -> new AchievementUnlocked(this, commit));
     }
 }

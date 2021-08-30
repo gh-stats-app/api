@@ -1,7 +1,8 @@
 package app.ghstats.api.services.slack;
 
 import app.ghstats.api.achievements.api.Achievement;
-import app.ghstats.api.achievements.api.UserName;
+import app.ghstats.api.achievements.api.AchievementUnlocked;
+import app.ghstats.api.achievements.api.CommitAuthor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpHeaders;
@@ -18,12 +19,14 @@ public class SlackClient {
     private final SlackConfigurationProperties configurationProperties;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public SlackClient(WebClient webClient, SlackConfigurationProperties configurationProperties) {
+    SlackClient(WebClient webClient, SlackConfigurationProperties configurationProperties) {
         this.webClient = webClient;
         this.configurationProperties = configurationProperties;
     }
 
-    public Mono<Void> sendMessage(Achievement achievement, UserName userName) {
+    public Mono<Void> sendUnlockedMessage(AchievementUnlocked achievementUnlocked) {
+        CommitAuthor author = achievementUnlocked.commit().author();
+        Achievement achievement = achievementUnlocked.achievement();
         return webClient.post()
                 .uri(configurationProperties.webhook())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -33,7 +36,7 @@ public class SlackClient {
                                         "type", "section",
                                         "text", Map.of(
                                                 "type", "mrkdwn",
-                                                "text", "*Achievement unlocked by `%s`!*\n\n>%s\n\n_%s_".formatted(userName, achievement.getName(), achievement.getDescription())
+                                                "text", "*Achievement unlocked by `<@%s>`!*\n\n>%s\n\n_%s_".formatted(author.userName(), achievement.getName(), achievement.getDescription())
                                         ),
                                         "accessory", Map.of(
                                                 "type", "image",

@@ -13,6 +13,11 @@ import java.util.Optional;
 class Alzheimer implements Achievement {
 
     @Override
+    public String getId() {
+        return "alzheimers";
+    }
+
+    @Override
     public String getName() {
         return "Alzheimer's";
     }
@@ -23,10 +28,10 @@ class Alzheimer implements Achievement {
     }
 
     @Override
-    public Optional<AchievementUnlocked> check(List<GitCommit> commits) {
+    public Optional<AchievementUnlocked> unlock(List<GitCommit> commits) {
         return commits.stream()
                 .filter(it -> it.timestamp().plusMonths(1).isBefore(ZonedDateTime.now(it.timestamp().getZone())))
                 .findFirst()
-                .map(commit -> new AchievementUnlocked(commit.id(), commit.userName()));
+                .map(commit -> new AchievementUnlocked(this, commit));
     }
 }

@@ -13,6 +13,11 @@ import java.util.Optional;
 class Valentine implements Achievement {
 
     @Override
+    public String getId() {
+        return "valentine";
+    }
+
+    @Override
     public String getName() {
         return "In Love with Work";
     }
@@ -23,10 +28,10 @@ class Valentine implements Achievement {
     }
 
     @Override
-    public Optional<AchievementUnlocked> check(List<GitCommit> commits) {
+    public Optional<AchievementUnlocked> unlock(List<GitCommit> commits) {
         return commits.stream()
                 .filter(it -> it.timestamp().getMonth() == Month.FEBRUARY && it.timestamp().getDayOfMonth() == 14)
                 .findAny()
-                .map(commit -> new AchievementUnlocked(commit.id(), commit.userName()));
+                .map(commit -> new AchievementUnlocked(this, commit));
     }
 }

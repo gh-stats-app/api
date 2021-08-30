@@ -1,4 +1,4 @@
 package app.ghstats.api.achievements.api;
 
-public record AchievementUnlocked(CommitId commitId, UserName userName) {
+public record AchievementUnlocked(Achievement achievement, GitCommit commit) {
 }

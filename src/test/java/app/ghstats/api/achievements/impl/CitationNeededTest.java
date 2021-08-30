@@ -22,10 +22,10 @@ class CitationNeededTest extends AchievementTest {
         );
 
         //when
-        Optional<AchievementUnlocked> check = achievement.check(commits);
+        Optional<AchievementUnlocked> check = achievement.unlock(commits);
 
         //expect
         Assertions.assertTrue(check.isPresent());
-        Assertions.assertEquals("commit-id", check.get().commitId().value());
+        Assertions.assertEquals("commit-id", check.get().commit().id().value());
     }
 }
