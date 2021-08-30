@@ -31,8 +31,13 @@ public class MailgunClient {
         MultiValueMap<String, String> context = new LinkedMultiValueMap<>();
         context.add("from", "gh-stats.app <no-reply@gh-stats.app>");
         context.add("to", achievementUnlocked.commit().author().userEmail().value());
-        context.add("subject", "Achievement Unlocked!");
-        context.add("text", "perfect!");
+        context.add("subject", "🏆 '%s' - Achievement Unlocked!".formatted(achievementUnlocked.achievement().getName()));
+        context.add("text", """
+                Congratulations!
+                                
+                With your commit (%s) you unlocked '%s' achievement!
+                Keep up the good work!
+                """.formatted(achievementUnlocked.commit().id(), achievementUnlocked.achievement().getName()));
         return webClient.post()
                 .uri(uri)
                 .headers(headers -> headers.setBasicAuth("api", apiKey))

@@ -40,7 +40,7 @@ public class SlackClient {
                                         ),
                                         "accessory", Map.of(
                                                 "type", "image",
-                                                "image_url", "https://gh-stats.app/img/%s".formatted(achievement.getImage()),
+                                                "image_url", "https://gh-stats.app/%s".formatted(achievement.getImage()),
                                                 "alt_text", achievement.getId()
                                         )
                                 ))

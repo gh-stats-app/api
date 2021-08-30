@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 @Component
 class Fix implements Achievement {
 
-    static final Pattern FIX_PATTERN = Pattern.compile("\\b(fix|fixes|fixed|fixing)?\\b", Pattern.CASE_INSENSITIVE);
+    static final Pattern FIX_PATTERN = Pattern.compile("(\\bfix(es|ed|ing)?\\b)", Pattern.CASE_INSENSITIVE);
 
     @Override
     public String getId() {
