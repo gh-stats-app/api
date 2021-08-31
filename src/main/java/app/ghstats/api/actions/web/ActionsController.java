@@ -52,8 +52,9 @@ class ActionsController {
     @GetMapping("/{user}/{actionName}")
     public Mono<ResponseEntity<List<LocalDateTime>>> getActionStats(@PathVariable Owner user, @PathVariable String actionName) {
         String[] split = actionName.split("@", 2);
+        String tag = split.length == 2 ? split[1] : null;
         ActionName repository = ActionName.valueOf(split[0]);
-        return Optional.ofNullable(split[1]).map(tag -> actionsQuery.getLastUsages(ActionId.valueOf(user, repository), tag).collectList())
+        return Optional.ofNullable(tag).map(tagValue -> actionsQuery.getLastUsages(ActionId.valueOf(user, repository), tagValue).collectList())
                 .orElseGet(() -> actionsQuery.getLastUsages(ActionId.valueOf(user, repository)).collectList())
                 .map(ResponseEntity::ok);
     }

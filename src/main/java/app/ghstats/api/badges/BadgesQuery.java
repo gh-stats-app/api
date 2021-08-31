@@ -26,6 +26,12 @@ public class BadgesQuery {
                 .flatMap(usage -> shieldsClient.getShield("Used ", "%d times".formatted(usage), color, queryParams));
     }
 
+    public Mono<String> getActionsBadge(ActionId actionId, String tag, String color, MultiValueMap<String, String> queryParams) {
+        return actionsQuery
+                .getUsageCount(actionId, tag)
+                .flatMap(usage -> shieldsClient.getShield("Used ", "%d times".formatted(usage), color, queryParams));
+    }
+
     public Mono<String> getUserBadge(String user, String color, MultiValueMap<String, String> queryParams) {
         return githubClient
                 .getLastCommitDate(user)

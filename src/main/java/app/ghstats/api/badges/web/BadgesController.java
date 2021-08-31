@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/badge")
@@ -27,13 +28,19 @@ class BadgesController {
     }
 
     @GetMapping(params = "action")
-    public Mono<ResponseEntity<String>> actionBadge(@RequestParam("action") ActionId actionId,
+    public Mono<ResponseEntity<String>> actionBadge(@RequestParam("action") String action,
                                                     @RequestParam(value = "color", defaultValue = "brightgreen") String color,
                                                     ServerHttpRequest request) {
         MultiValueMap<String, String> restQueryParams = new LinkedMultiValueMap<>(request.getQueryParams());
         restQueryParams.remove("action");
         restQueryParams.remove("color");
-        return badgesQuery.getActionsBadge(actionId, color, restQueryParams)
+
+        String[] split = action.split("@", 2);
+        ActionId actionId = ActionId.valueOf(split[0]);
+        String tag = split.length == 2 ? split[1] : null;
+
+        return Optional.ofNullable(tag).map(tagValue -> badgesQuery.getActionsBadge(actionId, tagValue, color, restQueryParams))
+                .orElseGet(() -> badgesQuery.getActionsBadge(actionId, color, restQueryParams))
                 .map(svg -> ResponseEntity.ok()
                         .header(HttpHeaders.CACHE_CONTROL, CacheControl.maxAge(Duration.ofSeconds(60)).cachePublic().getHeaderValue())
                         .header(HttpHeaders.CONTENT_TYPE, "image/svg+xml")
