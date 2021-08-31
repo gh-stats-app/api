@@ -19,9 +19,9 @@ public class ActionsCommand {
         this.notificationsCommand = notificationsCommand;
     }
 
-    public Mono<Boolean> markAction(ActionId actionId, RepositoryName repository, ReporterId reporterId) {
+    public Mono<Boolean> markAction(ActionId actionId, RepositoryName repository, String tag, ReporterId reporterId) {
         meterRegistry.counter(actionId.toString()).increment();
-        return actionsRepository.saveActionUsage(repository, actionId, reporterId);
+        return actionsRepository.saveActionUsage(repository, actionId, tag, reporterId);
     }
 }
 

@@ -3,6 +3,8 @@ package app.ghstats.api.actions.web;
 import app.ghstats.api.actions.ActionsCommand;
 import app.ghstats.api.actions.ActionsQuery;
 import app.ghstats.api.actions.api.ActionId;
+import app.ghstats.api.actions.api.ActionId.ActionName;
+import app.ghstats.api.actions.api.ActionId.Owner;
 import app.ghstats.api.actions.api.ReporterId;
 import app.ghstats.api.actions.api.RepositoryName;
 import org.slf4j.Logger;
@@ -20,6 +22,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/actions")
@@ -38,14 +41,20 @@ class ActionsController {
     public Mono<ResponseEntity<Void>> markActionUsage(@RequestBody MarkActionRequest markActionRequest,
                                                       @RequestHeader(name = "x-reporter", defaultValue = "unknown") ReporterId reporterId) {
         logger.info("got request to mark {} from repository {} by {}", markActionRequest.action(), markActionRequest.repository(), reporterId.value());
-        return actionsCommand.markAction(ActionId.fromGithubString(markActionRequest.action()), RepositoryName.valueOf(markActionRequest.repository()), reporterId).map(it -> {
+        ActionId actionId = ActionId.fromGithubString(markActionRequest.action());
+        String tag = markActionRequest.action().substring(markActionRequest.action().lastIndexOf('@') + 1).trim();
+        return actionsCommand.markAction(actionId, RepositoryName.valueOf(markActionRequest.repository()), tag, reporterId).map(it -> {
             if (it) return ResponseEntity.status(HttpStatus.CREATED).build();
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         });
     }
 
     @GetMapping("/{user}/{actionName}")
-    public Mono<ResponseEntity<List<LocalDateTime>>> getActionStats(@PathVariable ActionId.Owner user, @PathVariable ActionId.ActionName actionName) {
-        return actionsQuery.getLastUsages(ActionId.valueOf(user, actionName)).collectList().map(ResponseEntity::ok);
+    public Mono<ResponseEntity<List<LocalDateTime>>> getActionStats(@PathVariable Owner user, @PathVariable String actionName) {
+        String[] split = actionName.split("@", 2);
+        ActionName repository = ActionName.valueOf(split[0]);
+        return Optional.ofNullable(split[1]).map(tag -> actionsQuery.getLastUsages(ActionId.valueOf(user, repository), tag).collectList())
+                .orElseGet(() -> actionsQuery.getLastUsages(ActionId.valueOf(user, repository)).collectList())
+                .map(ResponseEntity::ok);
     }
 }

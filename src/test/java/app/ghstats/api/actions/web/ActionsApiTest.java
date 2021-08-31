@@ -78,6 +78,7 @@ class ActionsApiTest {
         //then
         response.expectStatus().isCreated();
         assertEquals(1L, actionsQuery.getUsageCount(ActionId.valueOf("allegro-actions/verify-configuration")).block());
+        assertEquals(1L, actionsQuery.getUsageCount(ActionId.valueOf("allegro-actions/verify-configuration"), "v1").block());
 
         Map<String, Object> dbRecord = databaseClient.sql("SELECT * FROM `stats`").fetch().all().blockFirst();
         assertEquals(1, dbRecord.get("ID"));

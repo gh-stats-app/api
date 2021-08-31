@@ -18,8 +18,16 @@ public class ActionsQuery {
         return actionsRepository.getUsageCount(actionId);
     }
 
+    public Mono<Long> getUsageCount(ActionId actionId, String tag) {
+        return actionsRepository.getUsageCount(actionId, tag);
+    }
+
     public Mono<Long> getRepositoriesCount(ActionId actionId) {
         return actionsRepository.getUsedByRepositoriesCount(actionId);
+    }
+
+    public Flux<LocalDateTime> getLastUsages(ActionId actionId, String tag) {
+        return actionsRepository.getLastUsages(actionId, tag);
     }
 
     public Flux<LocalDateTime> getLastUsages(ActionId actionId) {

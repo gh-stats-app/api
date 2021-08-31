@@ -9,11 +9,15 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 
 interface ActionsRepository {
-    Mono<Boolean> saveActionUsage(RepositoryName repository, ActionId actionId, ReporterId reporterId);
+    Mono<Boolean> saveActionUsage(RepositoryName repository, ActionId actionId, String tag, ReporterId reporterId);
 
     Mono<Long> getUsageCount(ActionId actionId);
+
+    Mono<Long> getUsageCount(ActionId actionId, String tag);
 
     Mono<Long> getUsedByRepositoriesCount(ActionId actionId);
 
     Flux<LocalDateTime> getLastUsages(ActionId actionId);
+
+    Flux<LocalDateTime> getLastUsages(ActionId actionId, String tag);
 }

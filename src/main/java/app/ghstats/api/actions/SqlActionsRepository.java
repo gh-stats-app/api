@@ -18,11 +18,12 @@ class SqlActionsRepository implements ActionsRepository {
     }
 
     @Override
-    public Mono<Boolean> saveActionUsage(RepositoryName repository, ActionId actionId, ReporterId reporterId) {
-        return databaseClient.sql("INSERT INTO `stats` (`repository`, `action`, `reporter`) VALUES (?, ?, ?)")
+    public Mono<Boolean> saveActionUsage(RepositoryName repository, ActionId actionId, String tag, ReporterId reporterId) {
+        return databaseClient.sql("INSERT INTO `stats` (`repository`, `action`, `tag`, `reporter`) VALUES (?, ?, ?, ?)")
                 .bind(0, repository.value())
                 .bind(1, actionId.serialize())
-                .bind(2, reporterId.value())
+                .bind(2, tag)
+                .bind(3, reporterId.value())
                 .fetch()
                 .rowsUpdated()
                 .map(it -> 1 == it);
@@ -32,6 +33,15 @@ class SqlActionsRepository implements ActionsRepository {
     public Mono<Long> getUsageCount(ActionId actionId) {
         return databaseClient.sql("SELECT COUNT(id) FROM `stats` WHERE action LIKE ?")
                 .bind(0, actionId.serialize())
+                .map(it -> it.get(0, Long.class))
+                .first();
+    }
+
+    @Override
+    public Mono<Long> getUsageCount(ActionId actionId, String tag) {
+        return databaseClient.sql("SELECT COUNT(id) FROM `stats` WHERE action LIKE ? and tag LIKE ?")
+                .bind(0, actionId.serialize())
+                .bind(1, tag)
                 .map(it -> it.get(0, Long.class))
                 .first();
     }
@@ -47,6 +57,15 @@ class SqlActionsRepository implements ActionsRepository {
     public Flux<LocalDateTime> getLastUsages(ActionId actionId) {
         return databaseClient.sql("SELECT * FROM `stats` WHERE action LIKE ? ORDER BY created_at DESC LIMIT 10")
                 .bind(0, actionId.serialize())
+                .map(it -> it.get("created_at", LocalDateTime.class))
+                .all();
+    }
+
+    @Override
+    public Flux<LocalDateTime> getLastUsages(ActionId actionId, String tag) {
+        return databaseClient.sql("SELECT * FROM `stats` WHERE action LIKE ? and tag LIKE ? ORDER BY created_at DESC LIMIT 10")
+                .bind(0, actionId.serialize())
+                .bind(1, tag)
                 .map(it -> it.get("created_at", LocalDateTime.class))
                 .all();
     }
