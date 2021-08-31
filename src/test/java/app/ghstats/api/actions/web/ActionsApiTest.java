@@ -64,7 +64,7 @@ class ActionsApiTest {
         // given
         Map<String, String> request = Map.of(
                 "repository", "bgalek/repository",
-                "action", "__allegro-actions_verify-configuration"
+                "action", "allegro-actions/verify-configuration@v1"
         );
 
         // when

@@ -5,6 +5,8 @@ import app.ghstats.api.actions.ActionsQuery;
 import app.ghstats.api.actions.api.ActionId;
 import app.ghstats.api.actions.api.ReporterId;
 import app.ghstats.api.actions.api.RepositoryName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +27,7 @@ class ActionsController {
 
     private final ActionsCommand actionsCommand;
     private final ActionsQuery actionsQuery;
+    private static final Logger logger = LoggerFactory.getLogger(ActionsController.class);
 
     ActionsController(ActionsCommand actionsCommand, ActionsQuery actionsQuery) {
         this.actionsCommand = actionsCommand;
@@ -34,6 +37,7 @@ class ActionsController {
     @PostMapping
     public Mono<ResponseEntity<Void>> markActionUsage(@RequestBody MarkActionRequest markActionRequest,
                                                       @RequestHeader(name = "x-reporter", defaultValue = "unknown") ReporterId reporterId) {
+        logger.info("got request to mark {} from repository {} by {}", markActionRequest.action(), markActionRequest.repository(), reporterId.value());
         return actionsCommand.markAction(ActionId.fromGithubString(markActionRequest.action()), RepositoryName.valueOf(markActionRequest.repository()), reporterId).map(it -> {
             if (it) return ResponseEntity.status(HttpStatus.CREATED).build();
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();

@@ -12,9 +12,10 @@ public record ActionId(Owner user, ActionName name) {
     }
 
     public static ActionId fromGithubString(String serialized) {
-        System.out.println(serialized);
-        String[] split = serialized.replaceFirst("__", "").replaceFirst("_", "/").split("/", 2);
-        return new ActionId(Owner.valueOf(split[0]), ActionName.valueOf(split[1]));
+        String[] split = serialized.split("@", 2);
+        String tag = split[1];
+        String[] split2 = split[0].split("/", 2);
+        return new ActionId(Owner.valueOf(split2[0]), ActionName.valueOf(split2[1]));
     }
 
     public String serialize() {
