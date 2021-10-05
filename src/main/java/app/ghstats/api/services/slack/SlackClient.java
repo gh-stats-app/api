@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public class SlackClient {
     public Mono<Void> sendUnlockedMessage(AchievementUnlocked achievementUnlocked) {
         CommitAuthor author = achievementUnlocked.commit().author();
         Achievement achievement = achievementUnlocked.achievement();
+        String imageUrl = UriComponentsBuilder.fromUriString("https://gh-stats.app").path(achievement.getImage().getPath()).build().toUriString();
         return webClient.post()
                 .uri(configurationProperties.webhook())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -40,7 +42,7 @@ public class SlackClient {
                                         ),
                                         "accessory", Map.of(
                                                 "type", "image",
-                                                "image_url", "https://gh-stats.app/%s".formatted(achievement.getImage()),
+                                                "image_url", imageUrl,
                                                 "alt_text", achievement.getId()
                                         )
                                 ))
