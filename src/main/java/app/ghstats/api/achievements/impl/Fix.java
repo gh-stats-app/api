@@ -16,7 +16,7 @@ class Fix implements Achievement {
 
     @Override
     public String getId() {
-        return "beggar";
+        return "fix";
     }
 
     @Override
