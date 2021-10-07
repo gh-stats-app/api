@@ -31,6 +31,7 @@ class BadgesController {
     public Mono<ResponseEntity<String>> actionBadge(@RequestParam("action") String action,
                                                     @RequestParam(value = "color", defaultValue = "brightgreen") String color,
                                                     ServerHttpRequest request) {
+        if (!action.contains("/")) return Mono.just(ResponseEntity.badRequest().build());
         MultiValueMap<String, String> restQueryParams = new LinkedMultiValueMap<>(request.getQueryParams());
         restQueryParams.remove("action");
         restQueryParams.remove("color");

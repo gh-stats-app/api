@@ -28,10 +28,10 @@ public class AchievementsCommand {
         List<Mono<Integer>> achievementsUnlocked = achievements.stream()
                 .map(achievement -> achievement
                         .unlock(commits)
-                        .map(achievementUnlocked -> Mono.zip(
-                                achievementsRepository.saveAchievement(achievement.getId(), achievementUnlocked),
-                                notificationsCommand.notify(achievementUnlocked),
-                                (integer, unused) -> integer))
+                        .map(achievementUnlocked -> achievementsRepository
+                                .saveAchievement(achievement.getId(), achievementUnlocked)
+                                .filter(it -> it > 0)
+                                .flatMap(it -> notificationsCommand.notify(achievementUnlocked).then(Mono.just(it))))
                         .orElseGet(() -> Mono.just(0)))
                 .collect(Collectors.toList());
         return Flux.concat(achievementsUnlocked).reduce(Integer::sum);

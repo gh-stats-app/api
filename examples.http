@@ -52,3 +52,30 @@ Content-Type: application/json
 
 ###
 
+POST http://localhost:8080/integrations/github/events
+Content-Type: application/json
+
+{
+  "zen": "Half measures are as bad as nothing at all.",
+  "hook_id": 322267498,
+  "hook": {
+    "type": "App",
+    "id": 322267498,
+    "name": "web",
+    "active": true,
+    "events": [
+      "meta",
+      "push"
+    ],
+    "config": {
+      "content_type": "json",
+      "insecure_ssl": "0",
+      "url": "https://gh-stats.app/integrations/github/events"
+    },
+    "updated_at": "2021-10-08T06:33:20Z",
+    "created_at": "2021-10-08T06:33:20Z",
+    "app_id": 143440,
+    "deliveries_url": "https://api.github.com/app/hook/deliveries"
+  }
+}
+

@@ -21,8 +21,8 @@ public class MailgunClient {
     private final WebClient webClient;
 
     MailgunClient(WebClient webClient, MailgunConfigurationProperties configurationProperties) {
-        this.apiKey = configurationProperties.getApiKey();
-        this.apiUrl = configurationProperties.getApiUrl();
+        this.apiKey = configurationProperties.apiKey();
+        this.apiUrl = configurationProperties.apiUrl();
         this.webClient = webClient;
     }
 
