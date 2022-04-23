@@ -37,6 +37,6 @@ class BashController {
     public Mono<ResponseEntity<String>> sha512() {
         return Mono.just(ResponseEntity.ok()
                 .header(CACHE_CONTROL, CacheControl.maxAge(Duration.ofDays(7)).cachePublic().getHeaderValue())
-                .body("c0a56470aae137209cf616c8a4d0e599de2d29a1e70697bca5526db5c6901e430acefad09fcf39d44e29410d29a5b467266e553c9421e526f9f7bb569d7ee9b"));
+                .body("e1c6fe93dc5fb2c953b18c7707e8820d43146cd90abfd8fe747142bdbca49e82305c247c61bf5919de8d8e4dbad7d9542c9b0025f98cdef287a983fd37e39b07"));
     }
 }
