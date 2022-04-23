@@ -1,8 +1,8 @@
 plugins {
     java
-    id("org.springframework.boot") version "2.5.5"
+    id("org.springframework.boot") version "2.6.7"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    id("com.adarshr.test-logger") version "3.0.0"
+    id("com.adarshr.test-logger") version "3.2.0"
 }
 
 group = "app.gh-stats"
@@ -24,11 +24,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
-    implementation("io.micrometer:micrometer-core:1.7.3")
-    implementation("com.google.guava:guava:31.0.1-jre")
+    implementation("io.micrometer:micrometer-core:1.8.4")
+    implementation("com.google.guava:guava:31.1-jre")
     implementation("com.github.slugify:slugify:2.5")
     implementation("org.ocpsoft.prettytime:prettytime:5.0.2.Final")
-    implementation("io.micrometer:micrometer-registry-graphite:latest.release")
+    implementation("io.micrometer:micrometer-registry-graphite:1.8.4")
 
     runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")
     runtimeOnly("mysql:mysql-connector-java")

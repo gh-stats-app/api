@@ -3,6 +3,9 @@ spring:
     url: r2dbc:h2:file:///./build/test
   flyway:
     url: jdbc:h2:file:./build/test
+  jackson:
+    mapper:
+      ACCEPT_CASE_INSENSITIVE_ENUMS: true
 
 server:
   error:
