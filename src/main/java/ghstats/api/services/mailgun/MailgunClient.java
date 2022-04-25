@@ -1,6 +1,7 @@
 package ghstats.api.services.mailgun;
 
 import ghstats.api.achievements.api.AchievementUnlocked;
+import ghstats.api.achievements.api.UserEmail;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
@@ -27,10 +28,13 @@ public class MailgunClient {
     }
 
     public Mono<String> sendUnlockedMessage(AchievementUnlocked achievementUnlocked) {
+        UserEmail userEmail = achievementUnlocked.commit().author().userEmail();
+        if (userEmail.value().contains("no-reply")) return Mono.empty();
+
         URI uri = UriComponentsBuilder.fromUriString(apiUrl).path(TARGET_PATH).build().toUri();
         MultiValueMap<String, String> context = new LinkedMultiValueMap<>();
         context.add("from", "gh-stats.app <no-reply@gh-stats.app>");
-        context.add("to", achievementUnlocked.commit().author().userEmail().value());
+        context.add("to", userEmail.value());
         context.add("subject", "🏆 '%s' - Achievement Unlocked!".formatted(achievementUnlocked.achievement().getName()));
         context.add("text", """
                 Congratulations!
