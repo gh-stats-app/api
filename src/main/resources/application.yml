@@ -6,6 +6,8 @@ spring:
   jackson:
     mapper:
       ACCEPT_CASE_INSENSITIVE_ENUMS: true
+  codec:
+    max-in-memory-size: 16MB
 
 server:
   error:
@@ -19,7 +21,7 @@ mailgun:
   apiUrl: https://api.mailgun.net/v3/sandboxdb6d46dbc2954406a1e4b94104af6d4e.mailgun.org
   apiKey: key
 
-graphite:
-  endpoint: https://graphite-prod-01-eu-west-0.grafana.net/graphite/metrics
-  instance: 203480
-  token: token
+cors:
+  origins:
+    - https://gh-stats.app
+    - http://localhost:3000

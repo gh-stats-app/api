@@ -24,11 +24,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
-    implementation("io.micrometer:micrometer-core:1.8.4")
+    implementation("io.micrometer:micrometer-core:1.8.5")
     implementation("com.google.guava:guava:31.1-jre")
     implementation("com.github.slugify:slugify:2.5")
     implementation("org.ocpsoft.prettytime:prettytime:5.0.2.Final")
-    implementation("io.micrometer:micrometer-registry-graphite:1.8.4")
 
     runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")
     runtimeOnly("mysql:mysql-connector-java")
@@ -37,7 +36,7 @@ dependencies {
     runtimeOnly("org.mariadb:r2dbc-mariadb:1.0.3")
     runtimeOnly("io.r2dbc:r2dbc-h2")
 
-    testImplementation("org.flywaydb:flyway-core")
+    testImplementation("org.flywaydb.flyway-test-extensions:flyway-spring-test")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
