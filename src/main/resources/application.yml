@@ -10,6 +10,7 @@ spring:
     max-in-memory-size: 16MB
 
 server:
+  forward-headers-strategy: FRAMEWORK
   error:
     whitelabel:
       enabled: false
