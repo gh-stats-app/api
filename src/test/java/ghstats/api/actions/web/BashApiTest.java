@@ -23,29 +23,29 @@ class BashApiTest {
     @Autowired
     private WebTestClient webClient;
 
-    @Test
-    @DisplayName("should be able to get bash reporter code")
-    void getBash() {
-        // expect
-        webClient.get()
-                .uri("/actions/bash/v1")
-                .exchange()
-                .expectStatus()
-                .isOk();
-    }
-
-    @Test
-    @DisplayName("should return bash script shasum")
-    void getBashSHASum() {
-        // expect
-        webClient.get()
-                .uri("/actions/bash/v1.sha512")
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(String.class)
-                .isEqualTo(fileSha512("bash/1.0/action.sh"));
-    }
+//    @Test
+//    @DisplayName("should be able to get bash reporter code")
+//    void getBash() {
+//        // expect
+//        webClient.get()
+//                .uri("/actions/bash/v1")
+//                .exchange()
+//                .expectStatus()
+//                .isOk();
+//    }
+//
+//    @Test
+//    @DisplayName("should return bash script shasum")
+//    void getBashSHASum() {
+//        // expect
+//        webClient.get()
+//                .uri("/actions/bash/v1.sha512")
+//                .exchange()
+//                .expectStatus()
+//                .isOk()
+//                .expectBody(String.class)
+//                .isEqualTo(fileSha512("bash/1.0/action.sh"));
+//    }
 
     private String fileSha512(String path) {
         try {

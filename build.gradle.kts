@@ -32,11 +32,11 @@ dependencies {
     runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")
     runtimeOnly("mysql:mysql-connector-java")
     runtimeOnly("com.h2database:h2")
-    runtimeOnly("org.flywaydb:flyway-core")
     runtimeOnly("org.mariadb:r2dbc-mariadb:1.0.3")
     runtimeOnly("io.r2dbc:r2dbc-h2")
 
-    testImplementation("org.flywaydb.flyway-test-extensions:flyway-spring-test")
+    testImplementation("org.flywaydb:flyway-core")
+    testImplementation("org.flywaydb.flyway-test-extensions:flyway-spring-test:7.0.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 

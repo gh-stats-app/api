@@ -10,7 +10,7 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
 import java.util.Arrays;
 
 @Configuration
-class CorsGlobalConfiguration implements WebFluxConfigurer {
+public class CorsGlobalConfiguration implements WebFluxConfigurer {
 
     private final CorsConfigurationProperties corsConfigurationProperties;
 

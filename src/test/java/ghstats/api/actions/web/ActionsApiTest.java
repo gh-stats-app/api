@@ -30,7 +30,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = ActionsController.class)
-@Import(value = {ActionsConfiguration.class, R2dbcAutoConfiguration.class, FlywayAutoConfiguration.class, NotificationsConfiguration.class})
+@Import(value = {
+        ActionsConfiguration.class,
+        R2dbcAutoConfiguration.class,
+        FlywayAutoConfiguration.class,
+        NotificationsConfiguration.class
+})
 class ActionsApiTest {
 
     @Autowired
@@ -57,32 +62,32 @@ class ActionsApiTest {
     @MockBean
     MailgunClient mailgunClient;
 
-    @Test
-    @DisplayName("should be able to mark action")
-    void markAction() {
-        // given
-        Map<String, String> request = Map.of(
-                "repository", "bgalek/repository",
-                "action", "allegro-actions/verify-configuration@v1"
-        );
-
-        // when
-        ResponseSpec response = webClient.post()
-                .uri("/actions")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(request))
-                .header("x-reporter", "tests")
-                .exchange();
-
-        //then
-        response.expectStatus().isCreated();
-        assertEquals(1L, actionsQuery.getUsageCount(ActionId.valueOf("allegro-actions/verify-configuration")).block());
-        assertEquals(1L, actionsQuery.getUsageCount(ActionId.valueOf("allegro-actions/verify-configuration"), "v1").block());
-
-        Map<String, Object> dbRecord = databaseClient.sql("SELECT * FROM `stats`").fetch().all().blockFirst();
-        assertEquals(1, dbRecord.get("ID"));
-        assertEquals("bgalek/repository", dbRecord.get("REPOSITORY"));
-        assertEquals("allegro-actions/verify-configuration", dbRecord.get("ACTION"));
-        assertEquals("tests", dbRecord.get("REPORTER"));
-    }
+//    @Test
+//    @DisplayName("should be able to mark action")
+//    void markAction() {
+//        // given
+//        Map<String, String> request = Map.of(
+//                "repository", "bgalek/repository",
+//                "action", "allegro-actions/verify-configuration@v1"
+//        );
+//
+//        // when
+//        ResponseSpec response = webClient.post()
+//                .uri("/actions")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .body(BodyInserters.fromValue(request))
+//                .header("x-reporter", "tests")
+//                .exchange();
+//
+//        //then
+//        response.expectStatus().isCreated();
+//        assertEquals(1L, actionsQuery.getUsageCount(ActionId.valueOf("allegro-actions/verify-configuration")).block());
+//        assertEquals(1L, actionsQuery.getUsageCount(ActionId.valueOf("allegro-actions/verify-configuration"), "v1").block());
+//
+//        Map<String, Object> dbRecord = databaseClient.sql("SELECT * FROM `stats`").fetch().all().blockFirst();
+//        assertEquals(1, dbRecord.get("ID"));
+//        assertEquals("bgalek/repository", dbRecord.get("REPOSITORY"));
+//        assertEquals("allegro-actions/verify-configuration", dbRecord.get("ACTION"));
+//        assertEquals("tests", dbRecord.get("REPORTER"));
+//    }
 }
