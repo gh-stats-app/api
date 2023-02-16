@@ -38,10 +38,9 @@ jobs:
 
       - name: Build app with pack CLI & publish to GitHub Container Registry
         run: |
-          pack build ghcr.io/jonashackt/spring-boot-flyio:latest \
+          pack build ghcr.io/gh-stats-app/api:latest \
               --builder paketobuildpacks/builder:base \
               --path . \
-              --env "BP_OCI_SOURCE=https://github.com/jonashackt/spring-boot-flyio" \
+              --env "BP_OCI_SOURCE=https://github.com/gh-stats-app/api" \
               --env "BP_JVM_VERSION=17" \
-              --cache-image ghcr.io/jonashackt/spring-boot-flyio-paketo-cache-image:latest \
               --publish
