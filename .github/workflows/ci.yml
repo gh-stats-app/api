@@ -25,22 +25,3 @@ jobs:
       
       - name: Test with Gradle
         run: ./gradlew check
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install pack CLI via the official buildpack Action
-        uses: buildpacks/github-actions/setup-pack@v5.0.0
-
-      - name: Build app with pack CLI & publish to GitHub Container Registry
-        run: |
-          pack build ghcr.io/gh-stats-app/api:latest \
-              --builder paketobuildpacks/builder:base \
-              --path . \
-              --env "BP_OCI_SOURCE=https://github.com/gh-stats-app/api" \
-              --env "BP_JVM_VERSION=17" \
-              --publish
