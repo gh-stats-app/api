@@ -28,6 +28,7 @@ dependencies {
     implementation("com.google.guava:guava:31.1-jre")
     implementation("com.github.slugify:slugify:2.5")
     implementation("org.ocpsoft.prettytime:prettytime:5.0.2.Final")
+    implementation("com.vdurmont:emoji-java:5.1.1")
 
     runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")
     runtimeOnly("mysql:mysql-connector-java")

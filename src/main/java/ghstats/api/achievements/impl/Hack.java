@@ -5,36 +5,35 @@ import ghstats.api.achievements.api.AchievementUnlocked;
 import ghstats.api.achievements.api.GitCommit;
 import org.springframework.stereotype.Component;
 
-import java.time.Month;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Component
-class Valentine implements Achievement {
+class Hack implements Achievement {
+
+    static final Pattern HACK_PATTERN = Pattern.compile("(\\bhack\\b)", Pattern.CASE_INSENSITIVE);
 
     @Override
     public String getId() {
-        return "valentine";
+        return "hack";
     }
 
     @Override
     public String getName() {
-        return "In Love with Work";
+        return "Real Hacker";
     }
 
     @Override
     public String getDescription() {
-        return "Commit on Feb 14, in the evening";
+        return "Use word “hack” in a commit message";
     }
 
     @Override
     public Optional<AchievementUnlocked> unlock(List<GitCommit> commits) {
         return commits.stream()
-                .filter(it -> it.timestamp().getMonth() == Month.FEBRUARY
-                        && it.timestamp().getDayOfMonth() == 14
-                        && it.timestamp().getHour() > 17
-                )
-                .findAny()
+                .filter(it -> HACK_PATTERN.matcher(it.message()).find())
+                .findFirst()
                 .map(commit -> new AchievementUnlocked(this, commit));
     }
 }

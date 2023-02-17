@@ -1,39 +1,37 @@
 package ghstats.api.achievements.impl;
 
+import com.vdurmont.emoji.EmojiManager;
 import ghstats.api.achievements.api.Achievement;
 import ghstats.api.achievements.api.AchievementUnlocked;
 import ghstats.api.achievements.api.GitCommit;
 import org.springframework.stereotype.Component;
 
-import java.time.Month;
+import java.time.DayOfWeek;
 import java.util.List;
 import java.util.Optional;
 
 @Component
-class Valentine implements Achievement {
+class Emoji implements Achievement {
 
     @Override
     public String getId() {
-        return "valentine";
+        return "emoji";
     }
 
     @Override
     public String getName() {
-        return "In Love with Work";
+        return "C00l kid";
     }
 
     @Override
     public String getDescription() {
-        return "Commit on Feb 14, in the evening";
+        return "Use emoji in a commit message";
     }
 
     @Override
     public Optional<AchievementUnlocked> unlock(List<GitCommit> commits) {
         return commits.stream()
-                .filter(it -> it.timestamp().getMonth() == Month.FEBRUARY
-                        && it.timestamp().getDayOfMonth() == 14
-                        && it.timestamp().getHour() > 17
-                )
+                .filter(it -> EmojiManager.containsEmoji(it.message()))
                 .findAny()
                 .map(commit -> new AchievementUnlocked(this, commit));
     }

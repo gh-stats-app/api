@@ -5,36 +5,35 @@ import ghstats.api.achievements.api.AchievementUnlocked;
 import ghstats.api.achievements.api.GitCommit;
 import org.springframework.stereotype.Component;
 
-import java.time.Month;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Component
-class Valentine implements Achievement {
+class Forgot implements Achievement {
+
+    static final Pattern FORGOT_PATTERN = Pattern.compile("(\\bforgot\\b)", Pattern.CASE_INSENSITIVE);
 
     @Override
     public String getId() {
-        return "valentine";
+        return "forgot";
     }
 
     @Override
     public String getName() {
-        return "In Love with Work";
+        return "Second Thoughts";
     }
 
     @Override
     public String getDescription() {
-        return "Commit on Feb 14, in the evening";
+        return "Use word “forgot” in a commit message";
     }
 
     @Override
     public Optional<AchievementUnlocked> unlock(List<GitCommit> commits) {
         return commits.stream()
-                .filter(it -> it.timestamp().getMonth() == Month.FEBRUARY
-                        && it.timestamp().getDayOfMonth() == 14
-                        && it.timestamp().getHour() > 17
-                )
-                .findAny()
+                .filter(it -> FORGOT_PATTERN.matcher(it.message()).find())
+                .findFirst()
                 .map(commit -> new AchievementUnlocked(this, commit));
     }
 }
