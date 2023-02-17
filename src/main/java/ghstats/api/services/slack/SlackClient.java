@@ -28,7 +28,7 @@ public class SlackClient {
     public Mono<Void> sendUnlockedMessage(AchievementUnlocked achievementUnlocked) {
         CommitAuthor author = achievementUnlocked.commit().author();
         Achievement achievement = achievementUnlocked.achievement();
-        String imageUrl = UriComponentsBuilder.fromUriString("https://gh-stats.app").path(achievement.getImage().getPath()).build().toUriString();
+        String imageUrl = UriComponentsBuilder.fromUriString("https://api.gh-stats.app").path(achievement.getImage().getPath()).build().toUriString();
         return webClient.post()
                 .uri(configurationProperties.webhook())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
