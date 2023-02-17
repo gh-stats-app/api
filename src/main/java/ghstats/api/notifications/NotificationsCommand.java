@@ -16,6 +16,7 @@ public class NotificationsCommand {
     }
 
     public Mono<Void> notify(AchievementUnlocked achievementUnlocked) {
-        return mailgunClient.sendUnlockedMessage(achievementUnlocked).then(slackClient.sendUnlockedMessage(achievementUnlocked));
+//        return mailgunClient.sendUnlockedMessage(achievementUnlocked).then(slackClient.sendUnlockedMessage(achievementUnlocked));
+        return slackClient.sendUnlockedMessage(achievementUnlocked);
     }
 }
