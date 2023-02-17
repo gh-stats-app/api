@@ -24,13 +24,16 @@ class Valentine implements Achievement {
 
     @Override
     public String getDescription() {
-        return "Commit on Feb 14";
+        return "Commit on Feb 14, in the evening.";
     }
 
     @Override
     public Optional<AchievementUnlocked> unlock(List<GitCommit> commits) {
         return commits.stream()
-                .filter(it -> it.timestamp().getMonth() == Month.FEBRUARY && it.timestamp().getDayOfMonth() == 14)
+                .filter(it -> it.timestamp().getMonth() == Month.FEBRUARY
+                        && it.timestamp().getDayOfMonth() == 14
+                        && it.timestamp().getHour() > 17
+                )
                 .findAny()
                 .map(commit -> new AchievementUnlocked(this, commit));
     }
