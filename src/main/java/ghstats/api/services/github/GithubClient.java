@@ -1,7 +1,7 @@
 package ghstats.api.services.github;
 
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
@@ -72,7 +72,7 @@ public class GithubClient {
                 .uri(uri)
                 .header(HttpHeaders.ACCEPT, "application/vnd.github.cloak-preview+json")
                 .retrieve()
-                .onStatus(HttpStatus::is4xxClientError, clientResponse -> clientResponse.bodyToMono(String.class).flatMap(error -> Mono.error(new RuntimeException(error))))
+                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> clientResponse.bodyToMono(String.class).flatMap(error -> Mono.error(new RuntimeException(error))))
                 .bodyToMono(CommitsResponse.class);
     }
 }

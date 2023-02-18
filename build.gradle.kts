@@ -1,8 +1,9 @@
 plugins {
     java
-    id("org.springframework.boot") version "2.6.7"
-    id("io.spring.dependency-management") version "1.0.11.RELEASE"
+    id("org.springframework.boot") version "3.0.2"
+    id("io.spring.dependency-management") version "1.1.0"
     id("com.adarshr.test-logger") version "3.2.0"
+    id("net.ltgt.errorprone") version "3.0.1"
 }
 
 group = "app.gh-stats"
@@ -10,7 +11,7 @@ version = "1.0.0"
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(19))
     }
 }
 
@@ -20,11 +21,12 @@ repositories {
 
 dependencies {
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    errorprone("com.google.errorprone:error_prone_core:2.18.0")
 
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
-    implementation("io.micrometer:micrometer-core:1.8.5")
+    implementation("io.micrometer:micrometer-registry-prometheus:latest.release")
     implementation("com.google.guava:guava:31.1-jre")
     implementation("com.github.slugify:slugify:2.5")
     implementation("org.ocpsoft.prettytime:prettytime:5.0.2.Final")
@@ -36,9 +38,9 @@ dependencies {
     runtimeOnly("org.mariadb:r2dbc-mariadb:1.0.3")
     runtimeOnly("io.r2dbc:r2dbc-h2")
 
-    testImplementation("org.flywaydb:flyway-core")
-    testImplementation("org.flywaydb.flyway-test-extensions:flyway-spring-test:7.0.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.flywaydb:flyway-core")
+    testImplementation("com.tngtech.archunit:archunit:1.0.1")
 }
 
 configurations {

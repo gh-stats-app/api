@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Optional;
 
-class CitationNeededTest extends AchievementTest {
+class CitationNeededTest extends BaseAchievementTest {
 
     @Test
     void shouldUnlock() {

@@ -5,33 +5,32 @@ import ghstats.api.achievements.api.AchievementUnlocked;
 import ghstats.api.achievements.api.GitCommit;
 import org.springframework.stereotype.Component;
 
-import java.time.DayOfWeek;
 import java.util.List;
 import java.util.Optional;
 
 @Component
-class DangerousGame implements Achievement {
+class Lucky implements Achievement {
 
     @Override
     public String getId() {
-        return "dangerous-game";
+        return "lucky";
     }
 
     @Override
     public String getName() {
-        return "Dangerous Game";
+        return "Lucky";
     }
 
     @Override
     public String getDescription() {
-        return "Commit after 18:00 on friday";
+        return "Consecutive 777 in commit hash";
     }
 
     @Override
     public Optional<AchievementUnlocked> unlock(List<GitCommit> commits) {
         return commits.stream()
-                .filter(it -> it.timestamp().getDayOfWeek() == DayOfWeek.FRIDAY && it.timestamp().getHour() > 18)
-                .findAny()
+                .filter(it -> it.id().value().contains("777"))
+                .findFirst()
                 .map(commit -> new AchievementUnlocked(this, commit));
     }
 }

@@ -54,6 +54,7 @@ class SqlActionsRepository implements ActionsRepository {
                 .first();
     }
 
+    @Override
     public Flux<LocalDateTime> getLastUsages(ActionId actionId) {
         return databaseClient.sql("SELECT * FROM `stats` WHERE action LIKE ? ORDER BY created_at DESC LIMIT 10")
                 .bind(0, actionId.serialize())

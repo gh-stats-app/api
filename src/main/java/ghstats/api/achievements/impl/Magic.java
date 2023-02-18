@@ -5,33 +5,35 @@ import ghstats.api.achievements.api.AchievementUnlocked;
 import ghstats.api.achievements.api.GitCommit;
 import org.springframework.stereotype.Component;
 
-import java.time.DayOfWeek;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Component
-class DangerousGame implements Achievement {
+class Magic implements Achievement {
+
+    static final Pattern FIX_PATTERN = Pattern.compile("(\\bmagic?\\b)", Pattern.CASE_INSENSITIVE);
 
     @Override
     public String getId() {
-        return "dangerous-game";
+        return "magic";
     }
 
     @Override
     public String getName() {
-        return "Dangerous Game";
+        return "The Colour of Magic";
     }
 
     @Override
     public String getDescription() {
-        return "Commit after 18:00 on friday";
+        return "Use word “magic” in a commit message";
     }
 
     @Override
     public Optional<AchievementUnlocked> unlock(List<GitCommit> commits) {
         return commits.stream()
-                .filter(it -> it.timestamp().getDayOfWeek() == DayOfWeek.FRIDAY && it.timestamp().getHour() > 18)
-                .findAny()
+                .filter(it -> FIX_PATTERN.matcher(it.message()).find())
+                .findFirst()
                 .map(commit -> new AchievementUnlocked(this, commit));
     }
 }

@@ -24,16 +24,16 @@ public class AchievementsCommand {
         this.notificationsCommand = notificationsCommand;
     }
 
-    public Mono<Integer> analyseCommit(List<GitCommit> commits) {
-        List<Mono<Integer>> achievementsUnlocked = achievements.stream()
+    public Mono<Long> analyseCommit(List<GitCommit> commits) {
+        List<Mono<Long>> achievementsUnlocked = achievements.stream()
                 .map(achievement -> achievement
                         .unlock(commits)
                         .map(achievementUnlocked -> achievementsRepository
                                 .saveAchievement(achievement.getId(), achievementUnlocked)
                                 .filter(it -> it > 0)
                                 .flatMap(it -> notificationsCommand.notify(achievementUnlocked).then(Mono.just(it))))
-                        .orElseGet(() -> Mono.just(0)))
+                        .orElseGet(() -> Mono.just(0L)))
                 .collect(Collectors.toList());
-        return Flux.concat(achievementsUnlocked).reduce(Integer::sum);
+        return Flux.concat(achievementsUnlocked).reduce(Long::sum);
     }
 }

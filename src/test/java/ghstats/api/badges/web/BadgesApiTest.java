@@ -1,61 +1,39 @@
 package ghstats.api.badges.web;
 
-import ghstats.api.actions.ActionsQuery;
+import ghstats.api.BaseIntegrationTest;
 import ghstats.api.actions.api.ActionId;
-import ghstats.api.badges.BadgesConfiguration;
-import ghstats.api.services.github.GithubConfiguration;
-import ghstats.api.services.shields.ShieldsConfiguration;
+import ghstats.api.badges.BadgesQuery;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
-import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.util.LinkedMultiValueMap;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 
-@ExtendWith(SpringExtension.class)
-@WebFluxTest(controllers = BadgesController.class)
-@Import(value = {
-        BadgesConfiguration.class,
-        R2dbcAutoConfiguration.class,
-        FlywayAutoConfiguration.class,
-        ShieldsConfiguration.class,
-        GithubConfiguration.class,
-})
-class BadgesApiTest {
-
-    @Autowired
-    private WebTestClient webClient;
+class BadgesApiTest extends BaseIntegrationTest {
 
     @MockBean
-    ActionsQuery actionsQuery;
+    private BadgesQuery badgesQuery;
 
-//    @Test
-//    @DisplayName("should return badge in svg format with cache for 60 min")
-//    void testBadge() {
-//        // given
-//        Mockito.when(actionsQuery.getUsageCount(ActionId.valueOf("bgalek/test-action")))
-//                .thenReturn(Mono.just(10L));
-//
-//        // expect
-//        webClient.get()
-//                .uri("/badge?action=bgalek/test-action")
-//                .exchange()
-//                .expectStatus()
-//                .isOk()
-//                .expectHeader()
-//                .contentType(MediaType.valueOf("image/svg+xml"))
-//                .expectHeader()
-//                .cacheControl(CacheControl.maxAge(Duration.ofSeconds(60)).cachePublic());
-//    }
+    @Test
+    @DisplayName("should return badge in svg format with cache for 60 min")
+    void testBadge() {
+        // given
+        Mockito.when(badgesQuery.getActionsBadge(ActionId.valueOf("bgalek/test-action"), "v1", "brightgreen", new LinkedMultiValueMap<>())).thenReturn(Mono.just("<svg />"));
+
+        // expect
+        webClient.get()
+                .uri("/badge?action=bgalek/test-action@v1")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .contentType(MediaType.valueOf("image/svg+xml"))
+                .expectHeader()
+                .cacheControl(CacheControl.maxAge(Duration.ofSeconds(60)).cachePublic());
+    }
 }

@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.r2dbc.core.DatabaseClient;
 
 @Configuration
-public
 class ActionsConfiguration {
 
     @Bean

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Optional;
 
-class WowTest extends AchievementTest {
+class WowTest extends BaseAchievementTest {
 
     @Test
     void shouldUnlock() {

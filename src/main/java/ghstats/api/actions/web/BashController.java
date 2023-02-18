@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 import static org.springframework.http.HttpHeaders.CACHE_CONTROL;
@@ -21,7 +22,7 @@ class BashController {
     private final String bash;
 
     BashController(ResourceLoader resourceLoader) throws IOException {
-        this.bash = new String(resourceLoader.getResource("classpath:/bash/1.0/action.sh").getInputStream().readAllBytes());
+        this.bash = new String(resourceLoader.getResource("classpath:/bash/1.0/action.sh").getInputStream().readAllBytes(), StandardCharsets.UTF_8);
     }
 
     @GetMapping("/v1")

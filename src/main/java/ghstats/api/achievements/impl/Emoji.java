@@ -6,7 +6,6 @@ import ghstats.api.achievements.api.AchievementUnlocked;
 import ghstats.api.achievements.api.GitCommit;
 import org.springframework.stereotype.Component;
 
-import java.time.DayOfWeek;
 import java.util.List;
 import java.util.Optional;
 

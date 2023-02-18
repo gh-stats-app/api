@@ -13,7 +13,6 @@ public record ActionId(Owner user, ActionName name) {
 
     public static ActionId fromGithubString(String serialized) {
         String[] split = serialized.split("@", 2);
-        String tag = split[1];
         String[] split2 = split[0].split("/", 2);
         return new ActionId(Owner.valueOf(split2[0]), ActionName.valueOf(split2[1]));
     }
@@ -27,7 +26,7 @@ public record ActionId(Owner user, ActionName name) {
         return serialize();
     }
 
-    public static record ActionName(String value) {
+    public record ActionName(String value) {
         public static ActionName valueOf(String name) {
             return new ActionName(name);
         }
@@ -38,7 +37,7 @@ public record ActionId(Owner user, ActionName name) {
         }
     }
 
-    public static record Owner(String value) {
+    public record Owner(String value) {
         public static Owner valueOf(String owner) {
             return new Owner(owner);
         }

@@ -1,8 +1,9 @@
 spring:
   r2dbc:
-    url: r2dbc:h2:file:///./build/test
+    url: r2dbc:h2:file:///./build/test;MODE=MySQL;NON_KEYWORDS=USER
   flyway:
-    url: jdbc:h2:file:./build/test
+    url: jdbc:h2:file:./build/test;MODE=MySQL;NON_KEYWORDS=USER
+    clean-disabled: false
   jackson:
     mapper:
       ACCEPT_CASE_INSENSITIVE_ENUMS: true
@@ -26,3 +27,11 @@ cors:
   origins:
     - https://gh-stats.app
     - http://localhost:3000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - prometheus
