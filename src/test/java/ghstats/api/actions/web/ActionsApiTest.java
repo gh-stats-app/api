@@ -3,12 +3,9 @@ package ghstats.api.actions.web;
 import ghstats.api.BaseIntegrationTest;
 import ghstats.api.actions.ActionsQuery;
 import ghstats.api.actions.api.ActionId;
-import ghstats.api.services.mailgun.MailgunClient;
-import ghstats.api.services.slack.SlackClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -28,12 +25,6 @@ class ActionsApiTest extends BaseIntegrationTest {
 
     @Autowired
     private DatabaseClient databaseClient;
-
-    @MockBean
-    private SlackClient slackClient;
-
-    @MockBean
-    private MailgunClient mailgunClient;
 
     @Test
     @DisplayName("should be able to mark action")

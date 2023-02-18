@@ -6,6 +6,7 @@ import ghstats.api.achievements.api.GitCommit;
 import ghstats.api.achievements.api.UserEmail;
 import ghstats.api.achievements.api.UserName;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -20,7 +21,7 @@ abstract class BaseAchievementTest {
                 CommitId.valueOf(id),
                 new CommitAuthor(UserName.valueOf("bgalek"), UserEmail.valueOf("bgalek@github.com")),
                 message,
-                ZonedDateTime.now(),
+                ZonedDateTime.now(ZoneId.systemDefault()),
                 List.of(),
                 List.of(),
                 List.of());
