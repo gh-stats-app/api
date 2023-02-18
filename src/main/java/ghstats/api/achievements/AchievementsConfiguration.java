@@ -2,6 +2,7 @@ package ghstats.api.achievements;
 
 import ghstats.api.achievements.api.Achievement;
 import ghstats.api.notifications.NotificationsCommand;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.r2dbc.core.DatabaseClient;
@@ -19,8 +20,9 @@ class AchievementsConfiguration {
     @Bean
     AchievementsCommand achievementsCommand(List<Achievement> achievements,
                                             AchievementsRepository achievementsRepository,
-                                            NotificationsCommand notificationsCommand) {
-        return new AchievementsCommand(achievements, achievementsRepository, notificationsCommand);
+                                            NotificationsCommand notificationsCommand,
+                                            MeterRegistry meterRegistry) {
+        return new AchievementsCommand(achievements, achievementsRepository, notificationsCommand, meterRegistry);
     }
 
     @Bean
