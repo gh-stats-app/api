@@ -31,6 +31,7 @@ dependencies {
     implementation("com.github.slugify:slugify:2.5")
     implementation("org.ocpsoft.prettytime:prettytime:5.0.2.Final")
     implementation("com.vdurmont:emoji-java:5.1.1")
+    implementation("org.flywaydb:flyway-core")
 
     runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")
     runtimeOnly("mysql:mysql-connector-java")
@@ -39,7 +40,6 @@ dependencies {
     runtimeOnly("io.r2dbc:r2dbc-h2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.flywaydb:flyway-core")
     testImplementation("com.tngtech.archunit:archunit:1.0.1")
 }
 
