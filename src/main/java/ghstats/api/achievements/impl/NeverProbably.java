@@ -1,8 +1,8 @@
 package ghstats.api.achievements.impl;
 
-import ghstats.api.achievements.api.Achievement;
 import ghstats.api.achievements.api.AchievementUnlocked;
-import ghstats.api.achievements.api.GitCommit;
+import ghstats.api.integrations.github.api.GitCommit;
+import ghstats.api.achievements.api.UnlockableAchievement;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Component
-class NeverProbably implements Achievement {
+class NeverProbably implements UnlockableAchievement {
 
     static final Pattern FIX_PATTERN = Pattern.compile("(\\blater?\\b)", Pattern.CASE_INSENSITIVE);
 

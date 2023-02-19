@@ -1,8 +1,8 @@
 package ghstats.api.achievements.impl;
 
-import ghstats.api.achievements.api.Achievement;
 import ghstats.api.achievements.api.AchievementUnlocked;
-import ghstats.api.achievements.api.GitCommit;
+import ghstats.api.integrations.github.api.GitCommit;
+import ghstats.api.achievements.api.UnlockableAchievement;
 import org.springframework.stereotype.Component;
 
 import java.time.Month;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-class Valentine implements Achievement {
+class Valentine implements UnlockableAchievement {
 
     @Override
     public String getId() {

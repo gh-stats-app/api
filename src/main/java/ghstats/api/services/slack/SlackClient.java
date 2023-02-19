@@ -2,9 +2,9 @@ package ghstats.api.services.slack;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ghstats.api.achievements.api.Achievement;
+import ghstats.api.achievements.api.AchievementDefinition;
 import ghstats.api.achievements.api.AchievementUnlocked;
-import ghstats.api.achievements.api.CommitAuthor;
+import ghstats.api.integrations.github.api.CommitAuthor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -27,7 +27,7 @@ public class SlackClient {
 
     public Mono<Void> sendUnlockedMessage(AchievementUnlocked achievementUnlocked) {
         CommitAuthor author = achievementUnlocked.commit().author();
-        Achievement achievement = achievementUnlocked.achievement();
+        AchievementDefinition achievement = achievementUnlocked.achievement();
         String imageUrl = UriComponentsBuilder.fromUriString("https://api.gh-stats.app").path(achievement.getImage().getPath()).build().toUriString();
         return webClient.post()
                 .uri(configurationProperties.webhook())

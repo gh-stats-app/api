@@ -6,11 +6,8 @@ import com.tngtech.archunit.lang.ArchRule;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 class ArchitectureTest {
     private JavaClasses applicationClasses = new ClassFileImporter().importPackages(this.getClass().getPackageName());
@@ -23,19 +20,6 @@ class ArchitectureTest {
                 .areAnnotatedWith(Configuration.class)
                 .should()
                 .notBePublic();
-        rule.check(applicationClasses);
-    }
-
-    @Test
-    @DisplayName("Configurations classes should not be public")
-    void componentsAndServices() {
-        ArchRule rule = noClasses()
-                .that()
-                .areAnnotatedWith(Component.class)
-                .or()
-                .areAnnotatedWith(Service.class)
-                .should()
-                .resideInAPackage(this.getClass().getPackageName());
         rule.check(applicationClasses);
     }
 

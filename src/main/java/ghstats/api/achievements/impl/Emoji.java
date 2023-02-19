@@ -1,16 +1,16 @@
 package ghstats.api.achievements.impl;
 
 import com.vdurmont.emoji.EmojiManager;
-import ghstats.api.achievements.api.Achievement;
 import ghstats.api.achievements.api.AchievementUnlocked;
-import ghstats.api.achievements.api.GitCommit;
+import ghstats.api.integrations.github.api.GitCommit;
+import ghstats.api.achievements.api.UnlockableAchievement;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 
 @Component
-class Emoji implements Achievement {
+class Emoji implements UnlockableAchievement {
 
     @Override
     public String getId() {

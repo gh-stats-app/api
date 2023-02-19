@@ -18,10 +18,10 @@ class AchievementsController {
     }
 
     @GetMapping
-    List<AchievementResponse> listAchievements() {
+    List<AchievementDefinitionResponse> listAchievements() {
         return achievementsQuery.getAll()
                 .stream()
-                .map(it -> new AchievementResponse(
+                .map(it -> new AchievementDefinitionResponse(
                         it.getId(),
                         it.getDescription(),
                         it.getImage(),

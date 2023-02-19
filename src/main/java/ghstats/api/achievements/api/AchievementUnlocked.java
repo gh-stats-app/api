@@ -1,4 +1,6 @@
 package ghstats.api.achievements.api;
 
-public record AchievementUnlocked(Achievement achievement, GitCommit commit) {
+import ghstats.api.integrations.github.api.GitCommit;
+
+public record AchievementUnlocked(AchievementDefinition achievement, GitCommit commit) {
 }

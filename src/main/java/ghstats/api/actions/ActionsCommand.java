@@ -17,7 +17,7 @@ public class ActionsCommand {
     }
 
     public Mono<Boolean> markAction(ActionId actionId, RepositoryName repository, String tag, ReporterId reporterId) {
-        meterRegistry.counter("action_", actionId.toString(), "action_mark").increment();
+        meterRegistry.counter("action_" + actionId.toString()).increment();
         return actionsRepository.saveActionUsage(repository, actionId, tag, reporterId);
     }
 }

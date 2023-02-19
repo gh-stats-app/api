@@ -1,6 +1,7 @@
 package ghstats.api.achievements;
 
-import ghstats.api.achievements.api.Achievement;
+import ghstats.api.achievements.api.AchievementDefinition;
+import ghstats.api.achievements.api.UnlockableAchievement;
 import ghstats.api.notifications.NotificationsCommand;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +19,7 @@ class AchievementsConfiguration {
     }
 
     @Bean
-    AchievementsCommand achievementsCommand(List<Achievement> achievements,
+    AchievementsCommand achievementsCommand(List<UnlockableAchievement> achievements,
                                             AchievementsRepository achievementsRepository,
                                             NotificationsCommand notificationsCommand,
                                             MeterRegistry meterRegistry) {
@@ -26,7 +27,7 @@ class AchievementsConfiguration {
     }
 
     @Bean
-    AchievementsQuery achievementsQuery(List<Achievement> achievements) {
+    AchievementsQuery achievementsQuery(List<AchievementDefinition> achievements) {
         return new AchievementsQuery(achievements);
     }
 }

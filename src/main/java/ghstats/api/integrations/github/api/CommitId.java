@@ -1,4 +1,4 @@
-package ghstats.api.achievements.api;
+package ghstats.api.integrations.github.api;
 
 public record CommitId(String value) {
     public static CommitId valueOf(String commitId) {

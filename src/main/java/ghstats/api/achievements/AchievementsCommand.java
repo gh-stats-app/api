@@ -1,7 +1,7 @@
 package ghstats.api.achievements;
 
-import ghstats.api.achievements.api.Achievement;
-import ghstats.api.achievements.api.GitCommit;
+import ghstats.api.achievements.api.UnlockableAchievement;
+import ghstats.api.integrations.github.api.GitCommit;
 import ghstats.api.notifications.NotificationsCommand;
 import io.micrometer.core.instrument.MeterRegistry;
 import reactor.core.publisher.Flux;
@@ -12,13 +12,13 @@ import java.util.stream.Collectors;
 
 public class AchievementsCommand {
 
-    private final List<Achievement> achievements;
+    private final List<UnlockableAchievement> achievements;
     private final AchievementsRepository achievementsRepository;
     private final NotificationsCommand notificationsCommand;
     private final MeterRegistry meterRegistry;
 
     public AchievementsCommand(
-            List<Achievement> achievements,
+            List<UnlockableAchievement> achievements,
             AchievementsRepository achievementsRepository,
             NotificationsCommand notificationsCommand,
             MeterRegistry meterRegistry
@@ -34,7 +34,7 @@ public class AchievementsCommand {
                 .map(achievement -> achievement
                         .unlock(commits)
                         .map(achievementUnlocked -> {
-                            meterRegistry.counter("achievement_" + achievement.getId(), "achievement");
+                            meterRegistry.counter("achievement_" + achievement.getId()).increment();
                             return achievementsRepository
                                     .saveAchievement(achievement.getId(), achievementUnlocked)
                                     .filter(it -> it > 0)

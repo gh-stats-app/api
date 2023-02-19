@@ -1,8 +1,8 @@
 package ghstats.api.achievements.impl;
 
-import ghstats.api.achievements.api.Achievement;
 import ghstats.api.achievements.api.AchievementUnlocked;
-import ghstats.api.achievements.api.GitCommit;
+import ghstats.api.integrations.github.api.GitCommit;
+import ghstats.api.achievements.api.UnlockableAchievement;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +14,7 @@ class WowTest extends BaseAchievementTest {
     @Test
     void shouldUnlock() {
         //given
-        Achievement achievement = new Wow();
+        UnlockableAchievement achievement = new Wow();
         List<GitCommit> commits = List.of(
                 commit("message!"),
                 commit("commit-id", "that was awesome! wow!"),

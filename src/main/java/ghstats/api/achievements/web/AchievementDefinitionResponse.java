@@ -2,7 +2,7 @@ package ghstats.api.achievements.web;
 
 import java.net.URI;
 
-record AchievementResponse(
+record AchievementDefinitionResponse(
         String id,
         String description,
         URI image,

@@ -1,11 +1,14 @@
 package ghstats.api.achievements.impl;
 
-import ghstats.api.achievements.api.CommitAuthor;
-import ghstats.api.achievements.api.CommitId;
-import ghstats.api.achievements.api.GitCommit;
-import ghstats.api.achievements.api.UserEmail;
-import ghstats.api.achievements.api.UserName;
+import ghstats.api.integrations.github.api.CommitAuthor;
+import ghstats.api.integrations.github.api.CommitId;
+import ghstats.api.integrations.github.api.GitCommit;
+import ghstats.api.integrations.github.api.OrganisationName;
+import ghstats.api.integrations.github.api.RepositoryName;
+import ghstats.api.integrations.github.api.UserEmail;
+import ghstats.api.integrations.github.api.UserName;
 
+import java.net.URI;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -24,6 +27,8 @@ abstract class BaseAchievementTest {
                 ZonedDateTime.now(ZoneId.systemDefault()),
                 List.of(),
                 List.of(),
-                List.of());
+                List.of(),
+                URI.create("/")
+        );
     }
 }

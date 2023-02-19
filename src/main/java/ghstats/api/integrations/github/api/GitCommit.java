@@ -1,5 +1,6 @@
-package ghstats.api.achievements.api;
+package ghstats.api.integrations.github.api;
 
+import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -10,6 +11,7 @@ public record GitCommit(
         ZonedDateTime timestamp,
         List<String> added,
         List<String> removed,
-        List<String> modified
+        List<String> modified,
+        URI url
 ) {
 }

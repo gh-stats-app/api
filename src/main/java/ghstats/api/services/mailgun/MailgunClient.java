@@ -1,7 +1,7 @@
 package ghstats.api.services.mailgun;
 
 import ghstats.api.achievements.api.AchievementUnlocked;
-import ghstats.api.achievements.api.UserEmail;
+import ghstats.api.integrations.github.api.UserEmail;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;

@@ -4,33 +4,31 @@ import com.github.slugify.Slugify;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-public interface Achievement {
+public interface AchievementDefinition {
 
     Slugify SLUGIFY = new Slugify();
 
-    String getId();
+    default String getId() {
+        return SLUGIFY.slugify(this.getName());
+    }
 
     String getName();
 
     String getDescription();
 
-    Optional<AchievementUnlocked> unlock(List<GitCommit> commits);
-
     default URI getImage() {
         return UriComponentsBuilder
                 .fromPath("/img/{filename}@6x.png")
-                .buildAndExpand(Map.of("filename", SLUGIFY.slugify(getId())))
+                .buildAndExpand(Map.of("filename", this.getId()))
                 .toUri();
     }
 
     default URI getIcon() {
         return UriComponentsBuilder
                 .fromPath("/img/{filename}.png")
-                .buildAndExpand(Map.of("filename", SLUGIFY.slugify(getId())))
+                .buildAndExpand(Map.of("filename", this.getId()))
                 .toUri();
     }
 }
