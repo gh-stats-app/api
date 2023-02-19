@@ -6,8 +6,6 @@ processes = []
 [env]
   SERVER_PORT = "8080"
   MAILGUN_APIURL = "https://api.eu.mailgun.net/v3/gh-stats.app"
-  OAUTH_GITHUB_ID = "e5543ac1303984425af3"
-  OAUTH_SLACK_ID = "2421191515847.2442127072932"
 
 [experimental]
   auto_rollback = true

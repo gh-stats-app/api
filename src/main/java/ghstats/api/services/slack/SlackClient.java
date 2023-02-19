@@ -38,14 +38,26 @@ public class SlackClient {
                                         "type", "section",
                                         "text", Map.of(
                                                 "type", "mrkdwn",
-                                                "text", "Achievement *%s* <https://github.com/search?q=hash%%3A%s&type=commits|unlocked> by <@%s>!\n\n_%s_".formatted(achievement.getName(), achievementUnlocked.commit().id(), author.userName(), achievement.getDescription())
+                                                "text", "*Good work!*\n\nAchievement *%s* <%s|unlocked> by <@%s>!\n_%s_".formatted(
+                                                        achievement.getName(),
+                                                        achievementUnlocked.commit().url(),
+                                                        author.userName(),
+                                                        achievement.getDescription())
                                         ),
                                         "accessory", Map.of(
                                                 "type", "image",
                                                 "image_url", imageUrl,
                                                 "alt_text", achievement.getId()
                                         )
-                                ))
+                                ),
+                                Map.of(
+                                        "type", "context",
+                                        "elements", List.of(Map.of(
+                                                "type", "mrkdwn",
+                                                "text", "Check out all unlockable achievements on <gh-stats.app|https://gh-stats.app>!"
+                                        ))
+                                )
+                        )
                 ))))
                 .retrieve()
                 .bodyToMono(Void.class);
