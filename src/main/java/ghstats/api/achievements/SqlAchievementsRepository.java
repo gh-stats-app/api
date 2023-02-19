@@ -1,8 +1,15 @@
 package ghstats.api.achievements;
 
 import ghstats.api.achievements.api.AchievementUnlocked;
+import ghstats.api.integrations.github.api.UserName;
+import org.springframework.data.util.Pair;
 import org.springframework.r2dbc.core.DatabaseClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 class SqlAchievementsRepository implements AchievementsRepository {
 
@@ -21,5 +28,30 @@ class SqlAchievementsRepository implements AchievementsRepository {
                 .bind(3, achievementId)
                 .fetch()
                 .rowsUpdated();
+    }
+
+    @Override
+    public Flux<Map<UserName, String>> getLastUnlocked(int limit) {
+        return databaseClient.sql("SELECT `user`, `achievement_id` FROM `achievements_unlocked` ORDER BY created_at DESC LIMIT ?")
+                .bind(0, limit)
+                .map(row -> Map.of(
+                        UserName.valueOf(row.get("user", String.class)),
+                        Objects.requireNonNull(row.get("achievement_id", String.class))))
+                .all();
+    }
+
+    @Override
+    public Mono<Map<UserName, Long>> getScoreboard() {
+        return databaseClient.sql("""
+                        select `user`, count(achievement_id) as count
+                        from achievements_unlocked
+                        group by user
+                        order by count desc
+                        limit 10
+                        """)
+                .flatMap(result -> result.map(row -> Pair.of(
+                        UserName.valueOf(row.get("user", String.class)),
+                        Objects.requireNonNull(row.get("count", Long.class)))))
+                .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
     }
 }

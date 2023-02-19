@@ -27,7 +27,7 @@ class AchievementsConfiguration {
     }
 
     @Bean
-    AchievementsQuery achievementsQuery(List<AchievementDefinition> achievements) {
-        return new AchievementsQuery(achievements);
+    AchievementsQuery achievementsQuery(List<AchievementDefinition> achievements, AchievementsRepository achievementsRepository) {
+        return new AchievementsQuery(achievements, achievementsRepository);
     }
 }
