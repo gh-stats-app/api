@@ -36,7 +36,7 @@ dependencies {
     runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")
     runtimeOnly("mysql:mysql-connector-java")
     runtimeOnly("com.h2database:h2")
-    runtimeOnly("dev.miku:r2dbc-mysql:0.8.2.RELEASE")
+    runtimeOnly("org.mariadb:r2dbc-mariadb:1.1.3")
     runtimeOnly("io.r2dbc:r2dbc-h2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
