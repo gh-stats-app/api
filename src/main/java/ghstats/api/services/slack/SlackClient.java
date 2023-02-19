@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Map;
 
-public class SlackClient {
+public class SlackClient implements NotificationChannel {
     private final WebClient webClient;
     private final SlackConfigurationProperties configurationProperties;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -25,6 +25,7 @@ public class SlackClient {
         this.configurationProperties = configurationProperties;
     }
 
+    @Override
     public Mono<Void> sendUnlockedMessage(AchievementUnlocked achievementUnlocked) {
         CommitAuthor author = achievementUnlocked.commit().author();
         AchievementDefinition achievement = achievementUnlocked.achievement();

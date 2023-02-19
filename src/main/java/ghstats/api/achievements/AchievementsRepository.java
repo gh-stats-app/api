@@ -13,4 +13,6 @@ interface AchievementsRepository {
     Flux<Map<UserName, String>> getLastUnlocked(int limit);
 
     Mono<Map<UserName, Long>> getScoreboard();
+
+    Flux<String> getUnlockedAchievements(UserName userName);
 }

@@ -54,4 +54,12 @@ class SqlAchievementsRepository implements AchievementsRepository {
                         Objects.requireNonNull(row.get("count", Long.class)))))
                 .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
     }
+
+    @Override
+    public Flux<String> getUnlockedAchievements(UserName userName) {
+        return databaseClient.sql("SELECT * FROM `achievements_unlocked` WHERE `user` = ?")
+                .bind(0, userName.value())
+                .map(it -> it.get("achievement_id", String.class))
+                .all();
+    }
 }
