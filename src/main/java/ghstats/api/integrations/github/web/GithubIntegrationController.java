@@ -4,8 +4,6 @@ import ghstats.api.achievements.AchievementsCommand;
 import ghstats.api.integrations.github.api.CommitAuthor;
 import ghstats.api.integrations.github.api.CommitId;
 import ghstats.api.integrations.github.api.GitCommit;
-import ghstats.api.integrations.github.api.OrganisationName;
-import ghstats.api.integrations.github.api.RepositoryName;
 import ghstats.api.integrations.github.api.UserEmail;
 import ghstats.api.integrations.github.api.UserName;
 import ghstats.api.integrations.github.web.GithubWebhookRequest.GithubCommitRequestItem;
@@ -39,6 +37,7 @@ class GithubIntegrationController {
         List<GitCommit> commits = githubWebhookRequest.commits()
                 .stream()
                 .map(GithubIntegrationController::toGitCommit)
+                .filter(commit -> !commit.author().userName().value().contains("[bot]"))
                 .collect(Collectors.toList());
         return achievementsCommand.analyseCommit(commits)
                 .publishOn(Schedulers.fromExecutor(Executors.newSingleThreadExecutor()))
