@@ -28,6 +28,10 @@ public class AchievementsQuery {
         return achievementsRepository.getLastUnlocked(10);
     }
 
+    public Mono<Map<String, Long>> getUnlockedStats() {
+        return achievementsRepository.getUnlockedStats();
+    }
+
     public Mono<Map<UserName, Long>> getScoreBoard() {
         return achievementsRepository.getScoreboard();
     }

@@ -7,8 +7,6 @@ import ghstats.api.actions.api.ActionId.ActionName;
 import ghstats.api.actions.api.ActionId.Owner;
 import ghstats.api.actions.api.ReporterId;
 import ghstats.api.actions.api.RepositoryName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +28,6 @@ class ActionsController {
 
     private final ActionsCommand actionsCommand;
     private final ActionsQuery actionsQuery;
-    private static final Logger logger = LoggerFactory.getLogger(ActionsController.class);
 
     ActionsController(ActionsCommand actionsCommand, ActionsQuery actionsQuery) {
         this.actionsCommand = actionsCommand;
@@ -40,7 +37,6 @@ class ActionsController {
     @PostMapping
     public Mono<ResponseEntity<Void>> markActionUsage(@RequestBody MarkActionRequest markActionRequest,
                                                       @RequestHeader(name = "x-reporter", defaultValue = "unknown") ReporterId reporterId) {
-        logger.info("got request to mark {} from repository {} by {}", markActionRequest.action(), markActionRequest.repository(), reporterId.value());
         ActionId actionId = ActionId.fromGithubString(markActionRequest.action());
         String tag = markActionRequest.action().substring(markActionRequest.action().lastIndexOf('@') + 1).trim();
         return actionsCommand.markAction(actionId, RepositoryName.valueOf(markActionRequest.repository()), tag, reporterId).map(it -> {

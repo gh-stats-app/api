@@ -41,6 +41,15 @@ class SqlAchievementsRepository implements AchievementsRepository {
     }
 
     @Override
+    public Mono<Map<String, Long>> getUnlockedStats() {
+        return databaseClient.sql("select achievement_id, count(achievement_id) as count from achievements_unlocked group by achievement_id order by count desc")
+                .flatMap(result -> result.map(row -> Pair.of(
+                        Objects.requireNonNull(row.get("achievement_id", String.class)),
+                        Objects.requireNonNull(row.get("count", Long.class)))))
+                .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
+    }
+
+    @Override
     public Mono<Map<UserName, Long>> getScoreboard() {
         return databaseClient.sql("""
                         select `user`, count(achievement_id) as count
