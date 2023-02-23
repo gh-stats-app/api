@@ -1,10 +1,12 @@
 package ghstats.api.achievements;
 
 import ghstats.api.achievements.api.AchievementDefinition;
+import ghstats.api.achievements.api.AchievementUnlockedFeedItem;
 import ghstats.api.integrations.github.api.UserName;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -24,8 +26,12 @@ public class AchievementsQuery {
         return achievements.values().stream().toList();
     }
 
-    public Flux<Map<UserName, String>> getLastUnlocked() {
-        return achievementsRepository.getLastUnlocked(10);
+    public Flux<AchievementUnlockedFeedItem> getFeed() {
+        return achievementsRepository.getLastUnlocked(10).map(unlockData -> new AchievementUnlockedFeedItem(
+                unlockData.user(),
+                achievements.get(unlockData.achievementId()),
+                unlockData.unlockedAt()
+        ));
     }
 
     public Mono<Map<String, Long>> getUnlockedStats() {

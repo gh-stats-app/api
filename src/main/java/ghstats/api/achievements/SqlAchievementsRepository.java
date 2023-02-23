@@ -7,6 +7,9 @@ import org.springframework.r2dbc.core.DatabaseClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -31,12 +34,13 @@ class SqlAchievementsRepository implements AchievementsRepository {
     }
 
     @Override
-    public Flux<Map<UserName, String>> getLastUnlocked(int limit) {
-        return databaseClient.sql("SELECT `user`, `achievement_id` FROM `achievements_unlocked` ORDER BY created_at DESC LIMIT ?")
+    public Flux<UnlockData> getLastUnlocked(int limit) {
+        return databaseClient.sql("SELECT `user`, `achievement_id`, `created_at` FROM `achievements_unlocked` ORDER BY created_at DESC LIMIT ?")
                 .bind(0, limit)
-                .map(row -> Map.of(
+                .map(row -> new UnlockData(
                         UserName.valueOf(row.get("user", String.class)),
-                        Objects.requireNonNull(row.get("achievement_id", String.class))))
+                        Objects.requireNonNull(row.get("achievement_id", String.class)),
+                        row.get("created_at", LocalDateTime.class).atZone(ZoneId.of("Europe/Warsaw"))))
                 .all();
     }
 

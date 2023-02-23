@@ -1,6 +1,7 @@
 package ghstats.api.achievements.web;
 
 import ghstats.api.achievements.AchievementsQuery;
+import ghstats.api.achievements.api.AchievementUnlockedFeedItem;
 import ghstats.api.integrations.github.api.UserName;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,9 +40,9 @@ class AchievementsController {
         return achievementsQuery.getScoreBoard();
     }
 
-    @GetMapping("/last")
-    Flux<Map<UserName, String>> last() {
-        return achievementsQuery.getLastUnlocked();
+    @GetMapping("/feed")
+    Flux<AchievementUnlockedFeedItem> feed() {
+        return achievementsQuery.getFeed();
     }
 
     @GetMapping("/stats")
