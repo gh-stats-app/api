@@ -15,8 +15,8 @@ class ChangeOfMindTest extends BaseAchievementTest {
         //given
         UnlockableAchievement achievement = new ChangeOfMind();
         List<GitCommit> commits = List.of(
-                commitWithModified("other", List.of("file.yaml", "abcd.yaml")),
-                commitWithModified("license-change", List.of("license.md"))
+                new CommitBuilder().withModified(List.of("file.yaml")).build(),
+                new CommitBuilder().withId("license-change").withModified(List.of("license.md")).build()
         );
 
         //when
