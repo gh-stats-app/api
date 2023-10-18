@@ -15,8 +15,8 @@ class DealWithItTest extends BaseAchievementTest {
         //given
         UnlockableAchievement achievement = new DealWithIt();
         List<GitCommit> commits = List.of(
-                commitWithRefAndForced("not-on-master", "refs/heads/other", true),
-                commitWithRefAndForced("on-master", "refs/heads/master", true)
+                new CommitBuilder().withId("on-master").withPushMetadata(new GitCommit.PushMetadata(true, "refs/heads/master")).build(),
+                new CommitBuilder().withId("not-on-master").withPushMetadata(new GitCommit.PushMetadata(true, "refs/heads/other")).build()
         );
 
         //when

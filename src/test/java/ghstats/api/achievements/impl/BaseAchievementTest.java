@@ -29,26 +29,12 @@ abstract class BaseAchievementTest {
                 List.of(),
                 modified,
                 URI.create("/"),
-                new GitCommit.PushMetadata(false, "refs/heads/main")
+                new GitCommit.PushMetadata(false, "refs/heads/master")
         );
     }
 
     GitCommit commit(String id, String message) {
         return commit(id, message, ZonedDateTime.now(ZoneId.systemDefault()));
-    }
-
-    GitCommit commitWithRefAndForced(String id, String ref, Boolean forced) {
-        return new GitCommit(
-                CommitId.valueOf(id),
-                new CommitAuthor(UserName.valueOf("bgalek"), UserEmail.valueOf("bgalek@github.com")),
-                UUID.randomUUID().toString(),
-                ZonedDateTime.now(ZoneId.systemDefault()),
-                List.of(),
-                List.of(),
-                List.of(),
-                URI.create("/"),
-                new GitCommit.PushMetadata(forced, ref)
-        );
     }
 
     GitCommit commit(String id, String message, ZonedDateTime timestamp) {
@@ -61,7 +47,7 @@ abstract class BaseAchievementTest {
                 List.of(),
                 List.of(),
                 URI.create("/"),
-                new GitCommit.PushMetadata(false, "ref/heads/master")
+                new GitCommit.PushMetadata(false, "refs/heads/master")
         );
     }
 }
