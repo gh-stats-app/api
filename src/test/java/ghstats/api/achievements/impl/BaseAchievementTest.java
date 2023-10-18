@@ -19,6 +19,19 @@ abstract class BaseAchievementTest {
         return commit(UUID.randomUUID().toString(), message);
     }
 
+    GitCommit commitWithModified(String id, List<String> modified) {
+        return new GitCommit(
+                CommitId.valueOf(id),
+                new CommitAuthor(UserName.valueOf("bgalek"), UserEmail.valueOf("bgalek@github.com")),
+                UUID.randomUUID().toString(),
+                ZonedDateTime.now(ZoneId.systemDefault()),
+                List.of(),
+                List.of(),
+                modified,
+                URI.create("/")
+        );
+    }
+
     GitCommit commit(String id, String message) {
         return commit(id, message, ZonedDateTime.now(ZoneId.systemDefault()));
     }

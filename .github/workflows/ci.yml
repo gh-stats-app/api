@@ -1,29 +1,40 @@
 name: Build & Publish
-
 on:
+  pull_request:
   push:
-    branches: [ main ]
-    paths-ignore:
-      - 'README.md'
-
+    branches: [main]
+permissions:
+  contents: write
+  pull-requests: write
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      GRADLE_OPTS: '-Dfile.encoding=utf-8 -Dorg.gradle.daemon=false'
       FLY_API_TOKEN: ${{ secrets.FLY_TOKEN }}
-
     steps:
-      - uses: actions/checkout@v3
-      
+      - uses: actions/checkout@v4
       - uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
-          java-version: '19'
-      
-      - name: Test with Gradle
-        run: ./gradlew build
-
+          distribution: temurin
+          java-version: 21
+      - run: ./gradlew build
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      
-      - run: flyctl deploy --remote-only
+      - name: Deploy
+        if: github.ref == 'refs/heads/main'
+        run: flyctl deploy --remote-only
+  dependabot:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' && github.actor == 'dependabot[bot]' }}
+    needs: build
+    steps:
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v1.6.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Enable auto-merge for Dependabot PRs
+        run: |
+          gh pr review --approve ${{ github.event.pull_request.html_url }}
+          gh pr merge --merge ${{ github.event.pull_request.html_url }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
