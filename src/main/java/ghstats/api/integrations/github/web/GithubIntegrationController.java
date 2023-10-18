@@ -34,9 +34,10 @@ class GithubIntegrationController {
 
     @PostMapping("/events")
     Mono<ResponseEntity<Void>> onGithubEvent(@RequestBody GithubWebhookRequest githubWebhookRequest) {
+        GitCommit.PushMetadata pushMetadata = toPushMetadata(githubWebhookRequest);
         List<GitCommit> commits = githubWebhookRequest.commits()
                 .stream()
-                .map(GithubIntegrationController::toGitCommit)
+                .map(it -> toGitCommit(it, pushMetadata))
                 .filter(commit -> !commit.author().userName().value().contains("[bot]"))
                 .collect(Collectors.toList());
         return achievementsCommand.analyseCommit(commits)
@@ -50,7 +51,7 @@ class GithubIntegrationController {
         return ResponseEntity.accepted().build();
     }
 
-    private static GitCommit toGitCommit(GithubCommitRequestItem commit) {
+    private static GitCommit toGitCommit(GithubCommitRequestItem commit, GitCommit.PushMetadata pushMetadata) {
         return new GitCommit(
                 CommitId.valueOf(commit.id()),
                 new CommitAuthor(UserName.valueOf(commit.author().username()), UserEmail.valueOf(commit.author().email())),
@@ -59,7 +60,15 @@ class GithubIntegrationController {
                 commit.added(),
                 commit.removed(),
                 commit.modified(),
-                commit.url()
+                commit.url(),
+                pushMetadata
+        );
+    }
+
+    private static GitCommit.PushMetadata toPushMetadata(GithubWebhookRequest githubWebhookRequest) {
+        return new GitCommit.PushMetadata(
+                githubWebhookRequest.forced(),
+                githubWebhookRequest.ref()
         );
     }
 }
