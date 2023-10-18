@@ -1,17 +1,17 @@
 plugins {
     java
-    id("org.springframework.boot") version "3.0.2"
-    id("io.spring.dependency-management") version "1.1.0"
-    id("com.adarshr.test-logger") version "3.2.0"
-    id("net.ltgt.errorprone") version "3.0.1"
+    id("org.springframework.boot") version "3.1.4"
+    id("io.spring.dependency-management") version "1.1.3"
+    id("com.adarshr.test-logger") version "4.0.0"
+    id("net.ltgt.errorprone") version "3.1.0"
 }
 
 group = "app.gh-stats"
-version = "1.0.0"
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(19))
+        languageVersion.set(JavaLanguageVersion.of(21))
+        vendor.set(JvmVendorSpec.ADOPTIUM)
     }
 }
 
@@ -27,20 +27,20 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
     implementation("io.micrometer:micrometer-registry-prometheus:latest.release")
-    implementation("com.google.guava:guava:31.1-jre")
-    implementation("com.github.slugify:slugify:2.5")
-    implementation("org.ocpsoft.prettytime:prettytime:5.0.2.Final")
+    implementation("com.google.guava:guava:32.1.3-jre")
+    implementation("com.github.slugify:slugify:3.0.6")
+    implementation("org.ocpsoft.prettytime:prettytime:5.0.7.Final")
     implementation("com.vdurmont:emoji-java:5.1.1")
     implementation("org.flywaydb:flyway-mysql")
 
     runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")
-    runtimeOnly("mysql:mysql-connector-java")
+    runtimeOnly("com.mysql:mysql-connector-j")
     runtimeOnly("com.h2database:h2")
-    runtimeOnly("org.mariadb:r2dbc-mariadb:1.1.3")
+    runtimeOnly("org.mariadb:r2dbc-mariadb:1.1.4")
     runtimeOnly("io.r2dbc:r2dbc-h2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("com.tngtech.archunit:archunit:1.0.1")
+    testImplementation("com.tngtech.archunit:archunit:1.1.0")
 }
 
 configurations {

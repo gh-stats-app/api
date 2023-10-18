@@ -8,7 +8,7 @@ import java.util.Map;
 
 public interface AchievementDefinition {
 
-    Slugify SLUGIFY = new Slugify();
+    Slugify SLUGIFY = Slugify.builder().build();
 
     default String getId() {
         return SLUGIFY.slugify(this.getName());

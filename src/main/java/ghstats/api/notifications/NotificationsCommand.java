@@ -8,6 +8,7 @@ import reactor.core.publisher.Mono;
 public class NotificationsCommand {
 
     private final SlackClient slackClient;
+    @SuppressWarnings("unused")
     private final MailgunClient mailgunClient;
 
     public NotificationsCommand(SlackClient slackClient, MailgunClient mailgunClient) {

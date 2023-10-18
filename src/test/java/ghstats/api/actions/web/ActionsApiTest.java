@@ -18,9 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ActionsApiTest extends BaseIntegrationTest {
 
     @Autowired
-    private WebTestClient webClient;
-
-    @Autowired
     private ActionsQuery actionsQuery;
 
     @Autowired
