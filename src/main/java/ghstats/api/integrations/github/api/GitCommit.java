@@ -12,6 +12,13 @@ public record GitCommit(
         List<String> added,
         List<String> removed,
         List<String> modified,
-        URI url
+        URI url,
+        PushMetadata pushMetadata
 ) {
+    public record PushMetadata(
+            Boolean forced,
+            String ref
+    ) {
+
+    }
 }
