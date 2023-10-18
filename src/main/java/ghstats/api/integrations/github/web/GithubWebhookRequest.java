@@ -7,7 +7,9 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 record GithubWebhookRequest(
-        @JsonProperty("commits") List<GithubCommitRequestItem> commits
+        @JsonProperty("commits") List<GithubCommitRequestItem> commits,
+        @JsonProperty("forced") Boolean forced,
+        @JsonProperty("ref") String ref
 ) {
     record GithubCommitRequestItem(
             @JsonProperty("id") String id,

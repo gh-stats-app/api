@@ -22,6 +22,7 @@ class CommitBuilder {
     private List<String> removed = List.of();
     private List<String> modified = List.of();
     private String url = "https://allegro.pl";
+    private GitCommit.PushMetadata pushMetadata = new GitCommit.PushMetadata(false, "refs/heads/"+UUID.randomUUID());
 
     CommitBuilder withId(String id) {
         this.id = id;
@@ -69,6 +70,11 @@ class CommitBuilder {
         return this;
     }
 
+    CommitBuilder withPushMetadata(GitCommit.PushMetadata metadata) {
+        this.pushMetadata = metadata;
+        return this;
+    }
+
     GitCommit build() {
         return new GitCommit(
                 CommitId.valueOf(this.id),
@@ -78,7 +84,8 @@ class CommitBuilder {
                 this.added,
                 this.removed,
                 this.modified,
-                URI.create(url)
+                URI.create(url),
+                this.pushMetadata
         );
     }
 }
