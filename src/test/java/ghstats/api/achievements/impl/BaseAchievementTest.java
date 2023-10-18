@@ -28,7 +28,8 @@ abstract class BaseAchievementTest {
                 List.of(),
                 List.of(),
                 modified,
-                URI.create("/")
+                URI.create("/"),
+                new GitCommit.PushMetadata(false, "refs/heads/main")
         );
     }
 
