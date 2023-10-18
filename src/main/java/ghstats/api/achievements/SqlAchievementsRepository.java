@@ -7,7 +7,6 @@ import org.springframework.r2dbc.core.DatabaseClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Map;
@@ -69,10 +68,13 @@ class SqlAchievementsRepository implements AchievementsRepository {
     }
 
     @Override
-    public Flux<String> getUnlockedAchievements(UserName userName) {
-        return databaseClient.sql("SELECT * FROM `achievements_unlocked` WHERE `user` = ?")
+    public Flux<Pair<String, String>> getUnlockedAchievements(UserName userName) {
+        return databaseClient
+                .sql("SELECT * FROM `achievements_unlocked` WHERE `user` = ?")
                 .bind(0, userName.value())
-                .map(it -> it.get("achievement_id", String.class))
+                .map(it -> Pair.of(
+                        Objects.requireNonNull(it.get("achievement_id", String.class)),
+                        Objects.requireNonNull(it.get("commit_id", String.class))))
                 .all();
     }
 }
