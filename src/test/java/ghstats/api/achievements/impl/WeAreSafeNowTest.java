@@ -14,7 +14,7 @@ public class WeAreSafeNowTest extends BaseAchievementTest {
     @Test
     void shouldNotUnlockWhenNoSecureCommitPresent() {
         //given
-        UnlockableAchievement achievement = new WeAreSareNow();
+        UnlockableAchievement achievement = new WeAreSafeNow();
         List<GitCommit> commits = List.of(
                 commit("some commit"),
                 commit("some other commit")
@@ -30,7 +30,7 @@ public class WeAreSafeNowTest extends BaseAchievementTest {
     @Test
     void shouldUnlockWhenSecureCommitPresent() {
         //given
-        UnlockableAchievement achievement = new WeAreSareNow();
+        UnlockableAchievement achievement = new WeAreSafeNow();
         GitCommit secureCommit = commit("secure commit");
         List<GitCommit> commits = List.of(
                 commit("some commit"),

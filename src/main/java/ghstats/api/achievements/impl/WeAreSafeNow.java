@@ -4,12 +4,11 @@ import ghstats.api.achievements.api.AchievementUnlocked;
 import ghstats.api.achievements.api.UnlockableAchievement;
 import ghstats.api.integrations.github.api.GitCommit;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-public class WeAreSareNow implements UnlockableAchievement {
+public class WeAreSafeNow implements UnlockableAchievement {
 
     static final Pattern PATTERN = Pattern.compile("(\\bsecure?\\b)", Pattern.CASE_INSENSITIVE);
 
