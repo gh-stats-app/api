@@ -6,6 +6,7 @@ import ghstats.api.integrations.github.api.UserName;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,35 @@ public class AchievementsQuery {
         return achievementsRepository.getScoreboard();
     }
 
-    public Mono<List<AchievementDefinition>> getUnlockedAchievements(UserName userName) {
-        return achievementsRepository.getUnlockedAchievements(userName).map(achievements::get).collectList();
+    public Mono<List<UserAchievement>> getUnlockedAchievements(UserName userName) {
+        return achievementsRepository.getUnlockedAchievements(userName)
+                .map(it -> {
+                    AchievementDefinition achievementDefinition = achievements.get(it.getFirst());
+                    return UserAchievement.of(achievementDefinition, it.getSecond());
+                }).collectList();
     }
+
+    public record UserAchievement(
+        String description,
+        String name,
+        String id,
+        URI image,
+        URI icon,
+        Commit commit
+    ) {
+        public static UserAchievement of(AchievementDefinition achievementDefinition, String commitId) {
+            return new UserAchievement(
+                    achievementDefinition.getDescription(),
+                    achievementDefinition.getName(),
+                    achievementDefinition.getId(),
+                    achievementDefinition.getImage(),
+                    achievementDefinition.getIcon(),
+                    new Commit("https://github.com/search?q="+ commitId +"&type=commits")
+            );
+        }
+        record Commit(
+                String url
+        ) {}
+    }
+
 }

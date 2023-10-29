@@ -21,7 +21,7 @@ class UsersController {
     }
 
     @GetMapping("/{username}")
-    Mono<List<AchievementDefinition>> listAchievements(@PathVariable String username) {
+    Mono<List<AchievementsQuery.UserAchievement>> listAchievements(@PathVariable String username) {
         return achievementsQuery.getUnlockedAchievements(UserName.valueOf(username));
     }
 }
