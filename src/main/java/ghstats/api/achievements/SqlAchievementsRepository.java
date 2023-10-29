@@ -7,9 +7,9 @@ import org.springframework.r2dbc.core.DatabaseClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -23,12 +23,12 @@ class SqlAchievementsRepository implements AchievementsRepository {
     }
 
     @Override
-    public Mono<Long> saveAchievement(String achievementId, AchievementUnlocked achievementUnlocked) {
+    public Mono<Long> saveAchievementUnlock(AchievementUnlocked achievementUnlocked) {
         return databaseClient.sql("INSERT IGNORE INTO `achievements_unlocked` (`user`, `commit_id`, `url`, `achievement_id`) VALUES (?, ?, ?, ?)")
                 .bind(0, achievementUnlocked.commit().author().userName().value())
                 .bind(1, achievementUnlocked.commit().id().value())
                 .bind(2, achievementUnlocked.commit().url().toString())
-                .bind(3, achievementId)
+                .bind(3, achievementUnlocked.achievement().getId())
                 .fetch()
                 .rowsUpdated();
     }
@@ -40,7 +40,7 @@ class SqlAchievementsRepository implements AchievementsRepository {
                 .map(row -> new UnlockData(
                         UserName.valueOf(row.get("user", String.class)),
                         Objects.requireNonNull(row.get("achievement_id", String.class)),
-                        row.get("created_at", LocalDateTime.class).atZone(ZoneId.of("Europe/Warsaw"))))
+                        Objects.requireNonNull(row.get("created_at", LocalDateTime.class)).atZone(ZoneId.of("Europe/Warsaw"))))
                 .all();
     }
 
@@ -69,10 +69,21 @@ class SqlAchievementsRepository implements AchievementsRepository {
     }
 
     @Override
-    public Flux<String> getUnlockedAchievements(UserName userName) {
+    public Flux<PersistedUserUnlockedAchievement> getUnlockedAchievements(UserName userName) {
         return databaseClient.sql("SELECT * FROM `achievements_unlocked` WHERE `user` = ?")
                 .bind(0, userName.value())
-                .map(it -> it.get("achievement_id", String.class))
+                .map(it -> new PersistedUserUnlockedAchievement(
+                        it.get("achievement_id", String.class),
+                        it.get("commit_id", String.class),
+                        Objects.requireNonNull(it.get("created_at", LocalDateTime.class)).atZone(ZoneId.of("Europe/Warsaw"))
+                ))
                 .all();
+    }
+
+    record PersistedUserUnlockedAchievement(
+            String achievementId,
+            String commitId,
+            ZonedDateTime unlockedAt
+    ) {
     }
 }

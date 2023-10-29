@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @RestController
@@ -21,7 +22,20 @@ class UsersController {
     }
 
     @GetMapping("/{username}")
-    Mono<List<AchievementDefinition>> listAchievements(@PathVariable String username) {
-        return achievementsQuery.getUnlockedAchievements(UserName.valueOf(username));
+    Mono<List<UserUnlockedAchievementResponse>> listAchievements(@PathVariable String username) {
+        return achievementsQuery
+                .getUnlockedAchievements(UserName.valueOf(username))
+                .map(it -> new UserUnlockedAchievementResponse(
+                        it.achievement(),
+                        it.commitId(),
+                        it.unlockedAt()
+                )).collectList();
+    }
+
+    private record UserUnlockedAchievementResponse(
+            AchievementDefinition achievement,
+            String commitId,
+            ZonedDateTime unlockedAt
+    ) {
     }
 }

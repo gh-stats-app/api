@@ -1,5 +1,6 @@
 package ghstats.api.achievements.impl;
 
+import ghstats.api.CommitBuilder;
 import ghstats.api.achievements.api.AchievementUnlocked;
 import ghstats.api.achievements.api.UnlockableAchievement;
 import ghstats.api.integrations.github.api.GitCommit;

@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
 class ArchitectureTest {
-    private JavaClasses applicationClasses = new ClassFileImporter().importPackages(this.getClass().getPackageName());
+    private final JavaClasses applicationClasses = new ClassFileImporter().importPackages(this.getClass().getPackageName());
 
     @Test
     @DisplayName("Configurations classes should not be public")

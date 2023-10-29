@@ -36,7 +36,7 @@ public class AchievementsCommand {
                         .map(achievementUnlocked -> {
                             meterRegistry.counter("achievement_" + achievement.getId()).increment();
                             return achievementsRepository
-                                    .saveAchievement(achievement.getId(), achievementUnlocked)
+                                    .saveAchievementUnlock(achievementUnlocked)
                                     .filter(it -> it > 0)
                                     .flatMap(it -> notificationsCommand.notify(achievementUnlocked).then(Mono.just(it)));
                         })

@@ -2,11 +2,11 @@ package ghstats.api.achievements;
 
 import ghstats.api.achievements.api.AchievementDefinition;
 import ghstats.api.achievements.api.AchievementUnlockedFeedItem;
+import ghstats.api.achievements.api.UserUnlockedAchievement;
 import ghstats.api.integrations.github.api.UserName;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -42,7 +42,13 @@ public class AchievementsQuery {
         return achievementsRepository.getScoreboard();
     }
 
-    public Mono<List<AchievementDefinition>> getUnlockedAchievements(UserName userName) {
-        return achievementsRepository.getUnlockedAchievements(userName).map(achievements::get).collectList();
+    public Flux<UserUnlockedAchievement> getUnlockedAchievements(UserName userName) {
+        return achievementsRepository
+                .getUnlockedAchievements(userName)
+                .map(it -> new UserUnlockedAchievement(
+                        achievements.get(it.achievementId()),
+                        it.commitId(),
+                        it.unlockedAt()
+                ));
     }
 }
