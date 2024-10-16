@@ -11,7 +11,6 @@ group = "app.gh-stats"
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(21))
-        vendor.set(JvmVendorSpec.ADOPTIUM)
     }
 }
 
