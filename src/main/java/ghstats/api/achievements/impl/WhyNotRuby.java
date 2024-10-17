@@ -31,7 +31,7 @@ class WhyNotRuby implements UnlockableAchievement {
     @Override
     public Optional<AchievementUnlocked> unlock(List<GitCommit> commits) {
         return commits.stream()
-                .filter(it -> Stream.of(it.modified(), it.removed(), it.added())
+                .filter(it -> Stream.of(it.added())
                         .flatMap(Collection::stream)
                         .anyMatch(s -> s.endsWith(".py")))
                 .findAny()
