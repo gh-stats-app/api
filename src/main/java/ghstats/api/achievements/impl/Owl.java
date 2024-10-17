@@ -18,14 +18,14 @@ class Owl implements UnlockableAchievement {
 
     @Override
     public String getDescription() {
-        return "Commit between 4am and 7am local time";
+        return "Commit between 4am and 6am local time";
     }
 
     @Override
     public Optional<AchievementUnlocked> unlock(List<GitCommit> commits) {
         return commits.stream()
                 .filter(commit -> commit.timestamp().getHour() >= 4
-                        && commit.timestamp().getHour() < 7)
+                        && commit.timestamp().getHour() < 6)
                 .findAny()
                 .map(commit -> new AchievementUnlocked(this, commit));
     }
