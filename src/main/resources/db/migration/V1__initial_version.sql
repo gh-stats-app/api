@@ -1,13 +1,13 @@
-create table stats
+CREATE TABLE achievements_unlocked
 (
-    id         int auto_increment primary key,
-    repository varchar(255)                          not null,
-    action     varchar(255)                          not null,
-    created_at timestamp default current_timestamp() not null
+    id             SERIAL PRIMARY KEY,
+    achievement_id VARCHAR(255)                        NOT NULL,
+    "user"         VARCHAR(255)                        NOT NULL,
+    commit_id      VARCHAR(255)                        NOT NULL,
+    url            VARCHAR(240)                        NOT NULL DEFAULT '',
+    created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT uniq_achievements_unlocked_user_achievement_id UNIQUE ("user", achievement_id)
 );
 
-create index action
-    on stats (action);
-
-create index repository
-    on stats (repository);
+CREATE INDEX idx_achievements_unlocked_achievement_id ON achievements_unlocked (achievement_id);
+CREATE INDEX idx_achievements_unlocked_user ON achievements_unlocked ("user");

@@ -1,14 +1,27 @@
+app:
+  db:
+    host-and-db: ep-little-waterfall-al48863o-pooler.c-3.eu-central-1.aws.neon.tech/neondb
+    options: sslmode=require&channel_binding=require
+    username: neondb_owner
+    password: placeholder
+
 spring:
   r2dbc:
-    url: r2dbc:h2:file:///./build/test;MODE=MySQL;NON_KEYWORDS=USER
+    url: r2dbc:postgresql://${app.db.host-and-db}?${app.db.options}
+    username: ${app.db.username}
+    password: ${app.db.password}
   flyway:
-    url: jdbc:h2:file:./build/test;MODE=MySQL;NON_KEYWORDS=USER
+    url: jdbc:postgresql://${app.db.host-and-db}?${app.db.options}
+    user: ${app.db.username}
+    password: ${app.db.password}
     clean-disabled: false
   jackson:
     mapper:
       ACCEPT_CASE_INSENSITIVE_ENUMS: true
   codec:
     max-in-memory-size: 16MB
+  jpa:
+    open-in-view: false
 
 server:
   forward-headers-strategy: FRAMEWORK
@@ -16,12 +29,10 @@ server:
     whitelabel:
       enabled: false
 
-slack:
-  webhook: https://webhook.site/45a4af23-15dc-4289-83ed-77e0e56573a6
-
-mailgun:
-  apiUrl: https://api.mailgun.net/v3/sandboxdb6d46dbc2954406a1e4b94104af6d4e.mailgun.org
-  apiKey: key
+github:
+  app:
+    id: 143440
+    private-key: ${GITHUB_APP_PRIVATE_KEY:}
 
 cors:
   origins:

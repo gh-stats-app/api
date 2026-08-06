@@ -1,57 +1,44 @@
 plugins {
     java
-    id("org.springframework.boot") version "3.1.4"
-    id("io.spring.dependency-management") version "1.1.3"
-    id("com.adarshr.test-logger") version "4.0.0"
-    id("net.ltgt.errorprone") version "3.1.0"
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.test.logger)
+    alias(libs.plugins.errorprone)
 }
 
 group = "app.gh-stats"
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion = JavaLanguageVersion.of(21)
     }
-}
-
-repositories {
-    mavenCentral()
 }
 
 dependencies {
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-    errorprone("com.google.errorprone:error_prone_core:2.18.0")
+    errorprone(libs.errorprone.core)
 
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
-    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
-    implementation("io.micrometer:micrometer-registry-prometheus:latest.release")
-    implementation("com.google.guava:guava:32.1.3-jre")
-    implementation("com.github.slugify:slugify:3.0.6")
-    implementation("org.ocpsoft.prettytime:prettytime:5.0.7.Final")
-    implementation("com.vdurmont:emoji-java:5.1.1")
-    implementation("org.flywaydb:flyway-mysql")
+    implementation(libs.spring.boot.starter.actuator)
+    implementation(libs.spring.boot.starter.webflux)
+    implementation(libs.spring.boot.starter.data.r2dbc)
+    implementation(libs.micrometer.registry.prometheus)
+    implementation(libs.guava)
+    implementation(libs.slugify)
+    implementation(libs.prettytime)
+    implementation(libs.emoji.java)
+    implementation(libs.flyway.database.postgresql)
+    runtimeOnly(libs.spring.boot.starter.jdbc)
+    runtimeOnly(libs.postgresql)
+    runtimeOnly(libs.r2dbc.postgresql)
+    runtimeOnly(libs.r2dbc.pool)
 
-    runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")
-    runtimeOnly("com.mysql:mysql-connector-j")
-    runtimeOnly("com.h2database:h2")
-    runtimeOnly("org.mariadb:r2dbc-mariadb:1.1.4")
-    runtimeOnly("io.r2dbc:r2dbc-h2")
-
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("com.tngtech.archunit:archunit:1.1.0")
-}
-
-configurations {
-    compileOnly {
-        extendsFrom(configurations.annotationProcessor.get())
-    }
+    testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.archunit)
+    testImplementation(libs.testcontainers.postgresql)
+    testImplementation(libs.testcontainers.r2dbc)
+    testImplementation(libs.testcontainers.junit.jupiter)
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-tasks.getByName<Jar>("jar") {
-    enabled = false
 }

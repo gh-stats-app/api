@@ -1,0 +1,40 @@
+[versions]
+springBoot = "3.4.3"
+springDependencyManagement = "1.1.7"
+testLogger = "4.0.0"
+errorProne = "3.1.0"
+errorProneCore = "2.18.0"
+micrometer = "latest.release"
+guava = "32.1.3-jre"
+slugify = "3.0.6"
+prettytime = "5.0.7.Final"
+emojiJava = "5.1.1"
+archunit = "1.4.1"
+testcontainers = "1.21.4"
+
+[libraries]
+errorprone-core = { group = "com.google.errorprone", name = "error_prone_core", version.ref = "errorProneCore" }
+spring-boot-starter-actuator = { group = "org.springframework.boot", name = "spring-boot-starter-actuator" }
+spring-boot-starter-webflux = { group = "org.springframework.boot", name = "spring-boot-starter-webflux" }
+spring-boot-starter-data-r2dbc = { group = "org.springframework.boot", name = "spring-boot-starter-data-r2dbc" }
+micrometer-registry-prometheus = { group = "io.micrometer", name = "micrometer-registry-prometheus", version.ref = "micrometer" }
+guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
+slugify = { group = "com.github.slugify", name = "slugify", version.ref = "slugify" }
+prettytime = { group = "org.ocpsoft.prettytime", name = "prettytime", version.ref = "prettytime" }
+emoji-java = { group = "com.vdurmont", name = "emoji-java", version.ref = "emojiJava" }
+flyway-database-postgresql = { group = "org.flywaydb", name = "flyway-database-postgresql" }
+spring-boot-starter-jdbc = { group = "org.springframework.boot", name = "spring-boot-starter-jdbc" }
+postgresql = { group = "org.postgresql", name = "postgresql" }
+r2dbc-postgresql = { group = "org.postgresql", name = "r2dbc-postgresql" }
+r2dbc-pool = { group = "io.r2dbc", name = "r2dbc-pool" }
+spring-boot-starter-test = { group = "org.springframework.boot", name = "spring-boot-starter-test" }
+archunit = { group = "com.tngtech.archunit", name = "archunit", version.ref = "archunit" }
+testcontainers-postgresql = { group = "org.testcontainers", name = "postgresql", version.ref = "testcontainers" }
+testcontainers-r2dbc = { group = "org.testcontainers", name = "r2dbc", version.ref = "testcontainers" }
+testcontainers-junit-jupiter = { group = "org.testcontainers", name = "junit-jupiter", version.ref = "testcontainers" }
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
+test-logger = { id = "com.adarshr.test-logger", version.ref = "testLogger" }
+errorprone = { id = "net.ltgt.errorprone", version.ref = "errorProne" }

@@ -24,19 +24,19 @@ class SqlAchievementsRepository implements AchievementsRepository {
 
     @Override
     public Mono<Long> saveAchievementUnlock(AchievementUnlocked achievementUnlocked) {
-        return databaseClient.sql("INSERT IGNORE INTO `achievements_unlocked` (`user`, `commit_id`, `url`, `achievement_id`) VALUES (?, ?, ?, ?)")
-                .bind(0, achievementUnlocked.commit().author().userName().value())
-                .bind(1, achievementUnlocked.commit().id().value())
-                .bind(2, achievementUnlocked.commit().url().toString())
-                .bind(3, achievementUnlocked.achievement().getId())
+        return databaseClient.sql("INSERT INTO achievements_unlocked (\"user\", commit_id, url, achievement_id) VALUES ($1, $2, $3, $4) ON CONFLICT (\"user\", achievement_id) DO NOTHING")
+                .bind("$1", achievementUnlocked.commit().author().userName().value())
+                .bind("$2", achievementUnlocked.commit().id().value())
+                .bind("$3", achievementUnlocked.commit().url().toString())
+                .bind("$4", achievementUnlocked.achievement().getId())
                 .fetch()
                 .rowsUpdated();
     }
 
     @Override
     public Flux<UnlockData> getLastUnlocked(int limit) {
-        return databaseClient.sql("SELECT `user`, `achievement_id`, `created_at` FROM `achievements_unlocked` ORDER BY created_at DESC LIMIT ?")
-                .bind(0, limit)
+        return databaseClient.sql("SELECT \"user\", achievement_id, created_at FROM achievements_unlocked ORDER BY created_at DESC LIMIT $1")
+                .bind("$1", limit)
                 .map(row -> new UnlockData(
                         UserName.valueOf(row.get("user", String.class)),
                         Objects.requireNonNull(row.get("achievement_id", String.class)),
@@ -56,9 +56,9 @@ class SqlAchievementsRepository implements AchievementsRepository {
     @Override
     public Mono<Map<UserName, Long>> getScoreboard() {
         return databaseClient.sql("""
-                        select `user`, count(achievement_id) as count
+                        select "user", count(achievement_id) as count
                         from achievements_unlocked
-                        group by user
+                        group by "user"
                         order by count desc
                         limit 10
                         """)
@@ -70,8 +70,8 @@ class SqlAchievementsRepository implements AchievementsRepository {
 
     @Override
     public Flux<PersistedUserUnlockedAchievement> getUnlockedAchievements(UserName userName) {
-        return databaseClient.sql("SELECT * FROM `achievements_unlocked` WHERE `user` = ?")
-                .bind(0, userName.value())
+        return databaseClient.sql("SELECT * FROM achievements_unlocked WHERE \"user\" = $1")
+                .bind("$1", userName.value())
                 .map(it -> new PersistedUserUnlockedAchievement(
                         it.get("achievement_id", String.class),
                         it.get("commit_id", String.class),

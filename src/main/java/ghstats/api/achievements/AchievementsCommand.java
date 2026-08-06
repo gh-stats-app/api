@@ -1,8 +1,8 @@
 package ghstats.api.achievements;
 
+import ghstats.api.achievements.api.AchievementUnlocked;
 import ghstats.api.achievements.api.UnlockableAchievement;
 import ghstats.api.integrations.github.api.GitCommit;
-import ghstats.api.notifications.NotificationsCommand;
 import io.micrometer.core.instrument.MeterRegistry;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -14,23 +14,20 @@ public class AchievementsCommand {
 
     private final List<UnlockableAchievement> achievements;
     private final AchievementsRepository achievementsRepository;
-    private final NotificationsCommand notificationsCommand;
     private final MeterRegistry meterRegistry;
 
     public AchievementsCommand(
             List<UnlockableAchievement> achievements,
             AchievementsRepository achievementsRepository,
-            NotificationsCommand notificationsCommand,
             MeterRegistry meterRegistry
     ) {
         this.achievements = achievements;
         this.achievementsRepository = achievementsRepository;
-        this.notificationsCommand = notificationsCommand;
         this.meterRegistry = meterRegistry;
     }
 
-    public Mono<Long> analyseCommit(List<GitCommit> commits) {
-        List<Mono<Long>> achievementsUnlocked = achievements.stream()
+    public Flux<AchievementUnlocked> analyseCommits(List<GitCommit> commits) {
+        List<Mono<AchievementUnlocked>> attemptedUnlocks = achievements.stream()
                 .map(achievement -> achievement
                         .unlock(commits)
                         .map(achievementUnlocked -> {
@@ -38,10 +35,10 @@ public class AchievementsCommand {
                             return achievementsRepository
                                     .saveAchievementUnlock(achievementUnlocked)
                                     .filter(it -> it > 0)
-                                    .flatMap(it -> notificationsCommand.notify(achievementUnlocked).then(Mono.just(it)));
+                                    .map(it -> achievementUnlocked);
                         })
-                        .orElseGet(() -> Mono.just(0L)))
+                        .orElseGet(Mono::empty))
                 .collect(Collectors.toList());
-        return Flux.concat(achievementsUnlocked).reduce(Long::sum);
+        return Flux.concat(attemptedUnlocks);
     }
 }
