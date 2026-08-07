@@ -6,6 +6,8 @@ app:
     password: placeholder
 
 spring:
+  application:
+    name: gh-stats-api
   r2dbc:
     url: r2dbc:postgresql://${app.db.host-and-db}?${app.db.options}
     username: ${app.db.username}
@@ -32,7 +34,9 @@ server:
 github:
   app:
     id: 143440
-    private-key: ${GITHUB_APP_PRIVATE_KEY:}
+    private-key: private-key
+  webhook:
+    secret: ""
 
 cors:
   origins:

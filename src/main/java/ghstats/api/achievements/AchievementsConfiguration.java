@@ -2,7 +2,7 @@ package ghstats.api.achievements;
 
 import ghstats.api.achievements.api.AchievementDefinition;
 import ghstats.api.achievements.api.UnlockableAchievement;
-import io.micrometer.core.instrument.MeterRegistry;
+import ghstats.api.infrastructure.DomainMetrics;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.r2dbc.core.DatabaseClient;
@@ -18,14 +18,19 @@ class AchievementsConfiguration {
     }
 
     @Bean
-    AchievementsCommand achievementsCommand(List<UnlockableAchievement> achievements,
-                                            AchievementsRepository achievementsRepository,
-                                            MeterRegistry meterRegistry) {
-        return new AchievementsCommand(achievements, achievementsRepository, meterRegistry);
+    AchievementsCommand achievementsCommand(
+            List<UnlockableAchievement> achievements,
+            AchievementsRepository achievementsRepository,
+            DomainMetrics domainMetrics
+    ) {
+        return new AchievementsCommand(achievements, achievementsRepository, domainMetrics);
     }
 
     @Bean
-    AchievementsQuery achievementsQuery(List<AchievementDefinition> achievements, AchievementsRepository achievementsRepository) {
+    AchievementsQuery achievementsQuery(
+            List<AchievementDefinition> achievements,
+            AchievementsRepository achievementsRepository
+    ) {
         return new AchievementsQuery(achievements, achievementsRepository);
     }
 }

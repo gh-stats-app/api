@@ -1,19 +1,19 @@
 [versions]
-springBoot = "3.4.3"
-springDependencyManagement = "1.1.7"
-testLogger = "4.0.0"
-errorProne = "3.1.0"
-errorProneCore = "2.18.0"
+spring-boot = "4.1.0"
+spring-dependency-management = "1.1.7"
+test-logger = "4.0.0"
+error-prone = "4.3.0"
+error-prone-core = "2.43.0"
 micrometer = "latest.release"
-guava = "32.1.3-jre"
-slugify = "3.0.6"
-prettytime = "5.0.7.Final"
-emojiJava = "5.1.1"
+guava = "33.5.0-jre"
+slugify = "3.0.7"
+prettytime = "5.0.9.Final"
+emoji-java = "5.1.1"
 archunit = "1.4.1"
 testcontainers = "1.21.4"
 
 [libraries]
-errorprone-core = { group = "com.google.errorprone", name = "error_prone_core", version.ref = "errorProneCore" }
+errorprone-core = { group = "com.google.errorprone", name = "error_prone_core", version.ref = "error-prone-core" }
 spring-boot-starter-actuator = { group = "org.springframework.boot", name = "spring-boot-starter-actuator" }
 spring-boot-starter-webflux = { group = "org.springframework.boot", name = "spring-boot-starter-webflux" }
 spring-boot-starter-data-r2dbc = { group = "org.springframework.boot", name = "spring-boot-starter-data-r2dbc" }
@@ -21,7 +21,7 @@ micrometer-registry-prometheus = { group = "io.micrometer", name = "micrometer-r
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 slugify = { group = "com.github.slugify", name = "slugify", version.ref = "slugify" }
 prettytime = { group = "org.ocpsoft.prettytime", name = "prettytime", version.ref = "prettytime" }
-emoji-java = { group = "com.vdurmont", name = "emoji-java", version.ref = "emojiJava" }
+emoji-java = { group = "com.vdurmont", name = "emoji-java", version.ref = "emoji-java" }
 flyway-database-postgresql = { group = "org.flywaydb", name = "flyway-database-postgresql" }
 spring-boot-starter-jdbc = { group = "org.springframework.boot", name = "spring-boot-starter-jdbc" }
 postgresql = { group = "org.postgresql", name = "postgresql" }
@@ -34,7 +34,7 @@ testcontainers-r2dbc = { group = "org.testcontainers", name = "r2dbc", version.r
 testcontainers-junit-jupiter = { group = "org.testcontainers", name = "junit-jupiter", version.ref = "testcontainers" }
 
 [plugins]
-spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
-spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
-test-logger = { id = "com.adarshr.test-logger", version.ref = "testLogger" }
-errorprone = { id = "net.ltgt.errorprone", version.ref = "errorProne" }
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
+test-logger = { id = "com.adarshr.test-logger", version.ref = "test-logger" }
+errorprone = { id = "net.ltgt.errorprone", version.ref = "error-prone" }
