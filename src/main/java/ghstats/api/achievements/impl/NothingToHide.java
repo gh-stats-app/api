@@ -1,6 +1,7 @@
 package ghstats.api.achievements.impl;
 
 import ghstats.api.achievements.api.AchievementUnlocked;
+import ghstats.api.achievements.api.PullRequestContext;
 import ghstats.api.achievements.api.UnlockableAchievement;
 import ghstats.api.integrations.github.api.GitCommit;
 import org.springframework.stereotype.Component;
@@ -35,12 +36,12 @@ class NothingToHide implements UnlockableAchievement {
     }
 
     @Override
-    public Optional<AchievementUnlocked> unlock(List<GitCommit> commits) {
-        return commits.stream()
-                .filter(it -> Stream.of(it.added(), it.modified())
-                        .flatMap(Collection::stream)
-                        .anyMatch(s -> SECRET_PATTERN.matcher(s).find()))
-                .findAny()
-                .map(commit -> new AchievementUnlocked(this, commit));
+    public Optional<AchievementUnlocked> unlock(PullRequestContext context) {
+        boolean containsSecret = Stream.of(context.addedFiles(), context.modifiedFiles())
+                .flatMap(Collection::stream)
+                .anyMatch(filename -> SECRET_PATTERN.matcher(filename).find());
+        return containsSecret
+                ? Optional.of(new AchievementUnlocked(this, context.recipient().userName(), context.triggerCommit()))
+                : Optional.empty();
     }
 }

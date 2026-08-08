@@ -3,6 +3,8 @@ package ghstats.api.services.github;
 import ghstats.api.integrations.github.api.CommitAuthor;
 import ghstats.api.integrations.github.api.CommitId;
 import ghstats.api.integrations.github.api.GitCommit;
+import ghstats.api.integrations.github.api.PullRequestEvidence;
+import ghstats.api.integrations.github.api.PullRequestFile;
 import ghstats.api.integrations.github.api.UserEmail;
 import ghstats.api.integrations.github.api.UserName;
 import org.springframework.core.ParameterizedTypeReference;
@@ -10,7 +12,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
 public class GithubClient {
@@ -25,7 +26,7 @@ public class GithubClient {
         this.authenticator = authenticator;
     }
 
-    public Mono<List<GitCommit>> fetchPrCommits(long installationId, String owner, String repo, int prNumber) {
+    public Mono<PullRequestEvidence> fetchPullRequestEvidence(long installationId, String owner, String repo, int prNumber) {
         return authenticator.installationToken(installationId)
                 .flatMap(token -> {
                     Mono<List<PrCommitResponse>> commitsMono = webClient.get()
@@ -42,10 +43,13 @@ public class GithubClient {
 
                     return Mono.zip(commitsMono, filesMono)
                             .map(tuple -> {
-                                DiffResult diff = toDiffResult(tuple.getT2());
-                                return tuple.getT1().stream()
-                                        .map(c -> toGitCommit(c, owner, repo, prNumber, diff))
+                                List<GitCommit> commits = tuple.getT1().stream()
+                                        .map(c -> toGitCommit(c, owner, repo, prNumber))
                                         .toList();
+                                List<PullRequestFile> files = tuple.getT2().stream()
+                                        .map(GithubClient::toPullRequestFile)
+                                        .toList();
+                                return new PullRequestEvidence(commits, files);
                             });
                 });
     }
@@ -79,43 +83,40 @@ public class GithubClient {
                         }));
     }
 
-    private static DiffResult toDiffResult(List<PullRequestFileResponse> files) {
-        List<String> added = new ArrayList<>();
-        List<String> removed = new ArrayList<>();
-        List<String> modified = new ArrayList<>();
-
-        for (PullRequestFileResponse file : files) {
-            if ("added".equals(file.status())) {
-                added.add(file.filename());
-            } else if ("removed".equals(file.status())) {
-                removed.add(file.filename());
-            } else {
-                modified.add(file.filename());
-            }
-        }
-
-        return new DiffResult(added, removed, modified);
-    }
-
-    private static GitCommit toGitCommit(PrCommitResponse c, String owner, String repo, int prNumber, DiffResult diff) {
+    private static GitCommit toGitCommit(PrCommitResponse c, String owner, String repo, int prNumber) {
         String login = c.author() != null ? c.author().login() : "unknown";
         return new GitCommit(
                 CommitId.valueOf(c.sha()),
                 new CommitAuthor(UserName.valueOf(login), UserEmail.valueOf("")),
                 c.commit().message(),
                 c.commit().author().date(),
-                diff.added(),
-                diff.removed(),
-                diff.modified(),
+                c.parents() == null ? List.of() : c.parents().stream().map(parent -> CommitId.valueOf(parent.sha())).toList(),
                 URI.create(c.htmlUrl() != null ? c.htmlUrl() : "https://github.com/%s/%s/pull/%d".formatted(owner, repo, prNumber)),
                 new GitCommit.PushMetadata(false, "refs/pull/%d/merge".formatted(prNumber))
+        );
+    }
+
+    private static PullRequestFile toPullRequestFile(PullRequestFileResponse file) {
+        return new PullRequestFile(
+                file.filename(),
+                PullRequestFile.Status.fromGithub(file.status()),
+                file.additions(),
+                file.deletions(),
+                file.changes(),
+                file.previousFilename(),
+                file.patch()
         );
     }
 
     @SuppressWarnings("UnusedVariable")
     private record PullRequestFileResponse(
             String filename,
-            String status
+            String status,
+            int additions,
+            int deletions,
+            int changes,
+            @com.fasterxml.jackson.annotation.JsonProperty("previous_filename") String previousFilename,
+            String patch
     ) {
     }
 

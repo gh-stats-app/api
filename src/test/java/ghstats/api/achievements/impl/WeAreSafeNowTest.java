@@ -21,7 +21,7 @@ public class WeAreSafeNowTest extends BaseAchievementTest {
         );
 
         //when
-        Optional<AchievementUnlocked> check = achievement.unlock(commits);
+        Optional<AchievementUnlocked> check = achievement.unlock(context(commits));
 
         //then
         Assertions.assertTrue(check.isEmpty());
@@ -39,7 +39,7 @@ public class WeAreSafeNowTest extends BaseAchievementTest {
         );
 
         //when
-        Optional<AchievementUnlocked> check = achievement.unlock(commits);
+        Optional<AchievementUnlocked> check = achievement.unlock(context(commits));
 
         //then
         Assertions.assertTrue(check.isPresent());

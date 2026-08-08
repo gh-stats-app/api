@@ -1,6 +1,7 @@
 package ghstats.api.achievements.impl;
 
 import ghstats.api.achievements.api.AchievementUnlocked;
+import ghstats.api.achievements.api.PullRequestContext;
 import ghstats.api.achievements.api.UnlockableAchievement;
 import ghstats.api.integrations.github.api.GitCommit;
 import org.springframework.stereotype.Component;
@@ -27,10 +28,12 @@ class Eraser implements UnlockableAchievement {
     }
 
     @Override
-    public Optional<AchievementUnlocked> unlock(List<GitCommit> commits) {
-        return commits.stream()
-                .filter(it -> it.added().isEmpty() && !it.removed().isEmpty() && it.modified().isEmpty())
-                .findAny()
-                .map(commit -> new AchievementUnlocked(this, commit));
+    public Optional<AchievementUnlocked> unlock(PullRequestContext context) {
+        boolean onlyRemovesFiles = context.addedFiles().isEmpty()
+                && !context.removedFiles().isEmpty()
+                && context.modifiedFiles().isEmpty();
+        return onlyRemovesFiles
+                ? Optional.of(new AchievementUnlocked(this, context.recipient().userName(), context.triggerCommit()))
+                : Optional.empty();
     }
 }

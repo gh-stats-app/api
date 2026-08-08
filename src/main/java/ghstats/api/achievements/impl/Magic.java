@@ -1,6 +1,7 @@
 package ghstats.api.achievements.impl;
 
 import ghstats.api.achievements.api.AchievementUnlocked;
+import ghstats.api.achievements.api.PullRequestContext;
 import ghstats.api.integrations.github.api.GitCommit;
 import ghstats.api.achievements.api.UnlockableAchievement;
 import org.springframework.stereotype.Component;
@@ -30,10 +31,11 @@ class Magic implements UnlockableAchievement {
     }
 
     @Override
-    public Optional<AchievementUnlocked> unlock(List<GitCommit> commits) {
+    public Optional<AchievementUnlocked> unlock(PullRequestContext context) {
+        List<GitCommit> commits = context.commits();
         return commits.stream()
                 .filter(it -> FIX_PATTERN.matcher(it.message()).find())
                 .findFirst()
-                .map(commit -> new AchievementUnlocked(this, commit));
+                .map(commit -> new AchievementUnlocked(this, context.recipient().userName(), commit));
     }
 }

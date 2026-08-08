@@ -105,6 +105,7 @@ public class DomainMetrics {
     public enum WebhookSkipReason {
         PING("ping"),
         NOT_MERGED("not_merged"),
+        BOT_AUTHOR("bot_author"),
         MISSING_INSTALLATION("missing_installation"),
         UNSUPPORTED_EVENT("unsupported_event"),
         UNSUPPORTED_ACTION("unsupported_action"),

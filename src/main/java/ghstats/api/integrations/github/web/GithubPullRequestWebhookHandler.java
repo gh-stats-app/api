@@ -2,15 +2,26 @@ package ghstats.api.integrations.github.web;
 
 import com.github.bgalek.github.dotcom.models.EventPayload;
 import ghstats.api.achievements.AchievementsCommand;
+import ghstats.api.achievements.api.AchievementUnlocked;
+import ghstats.api.achievements.api.PullRequestContext;
+import ghstats.api.achievements.api.PullRequestSnapshot;
 import ghstats.api.infrastructure.DomainMetrics;
 import ghstats.api.infrastructure.DomainMetrics.PullRequestProcessingResult;
 import ghstats.api.infrastructure.DomainMetrics.WebhookSkipReason;
 import ghstats.api.services.github.GithubClient;
+import ghstats.api.integrations.github.api.CommitId;
+import ghstats.api.integrations.github.api.GithubUser;
+import ghstats.api.integrations.github.api.OrganisationName;
+import ghstats.api.integrations.github.api.RepositoryName;
+import ghstats.api.integrations.github.api.UserName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+
+import java.net.URI;
+import java.util.List;
 
 @Component
 class GithubPullRequestWebhookHandler {
@@ -40,7 +51,11 @@ class GithubPullRequestWebhookHandler {
         }
         boolean merged = request.pullRequest() != null && Boolean.TRUE.equals(request.pullRequest().merged());
         domainMetrics.githubWebhookReceived(event.getAction(), merged);
-        if (!shouldProcess(event.getAction(), merged)) {
+        if (!"closed".equals(event.getAction())) {
+            domainMetrics.githubWebhookSkipped(WebhookSkipReason.UNSUPPORTED_ACTION);
+            return accepted();
+        }
+        if (!merged) {
             domainMetrics.githubWebhookSkipped(WebhookSkipReason.NOT_MERGED);
             return accepted();
         }
@@ -58,51 +73,50 @@ class GithubPullRequestWebhookHandler {
             domainMetrics.githubWebhookSkipped(WebhookSkipReason.MISSING_INSTALLATION);
             return accepted();
         }
-        if (merged) {
-            return unlockMergedPullRequest(installationId, owner, repo, prNumber);
+        var recipient = new GithubUser(
+                UserName.valueOf(request.pullRequest().user().login()),
+                request.pullRequest().user().type()
+        );
+        if (recipient.isBot()) {
+            domainMetrics.githubWebhookSkipped(WebhookSkipReason.BOT_AUTHOR);
+            return accepted();
         }
-        return previewPullRequest(installationId, owner, repo, prNumber);
+        return unlockMergedPullRequest(installationId, owner, repo, prNumber, recipient, request.pullRequest());
     }
 
-    private Mono<ResponseEntity<Void>> previewPullRequest(long installationId, String owner, String repo, int prNumber) {
+    private Mono<ResponseEntity<Void>> unlockMergedPullRequest(
+            long installationId,
+            String owner,
+            String repo,
+            int prNumber,
+            GithubUser recipient,
+            GithubPullRequestWebhookRequest.PullRequest pullRequest
+    ) {
         var processingTimer = domainMetrics.startGithubPullRequestProcessing();
 
-        return githubClient.fetchPrCommits(installationId, owner, repo, prNumber)
-                .flatMap(commits -> {
-                    var filtered = commits.stream()
-                            .filter(c -> !c.author().userName().value().contains("[bot]"))
+        return githubClient.fetchPullRequestEvidence(installationId, owner, repo, prNumber)
+                .flatMap(evidence -> {
+                    var filtered = evidence.commits().stream()
+                            .filter(commit -> !isBot(commit.author().userName()))
                             .toList();
-                    domainMetrics.githubPullRequestCommits(commits.size(), commits.size() - filtered.size());
-                    return achievementsCommand.previewCommits(filtered).collectList();
-                })
-                .flatMap(unlocks -> {
-                    if (unlocks.isEmpty()) {
-                        domainMetrics.githubPullRequestProcessed(processingTimer, PullRequestProcessingResult.NO_UNLOCKS);
-                        return accepted();
+                    domainMetrics.githubPullRequestCommits(
+                            evidence.commits().size(),
+                            evidence.commits().size() - filtered.size()
+                    );
+                    if (filtered.isEmpty()) {
+                        return Mono.just(List.<AchievementUnlocked>of());
                     }
-                    String userName = unlocks.getFirst().commit().author().userName().value();
-                    String comment = commentFormatter.formatPreview(userName);
-                    return githubClient.createOrUpdatePrComment(installationId, owner, repo, prNumber, comment)
-                            .doOnSuccess(ignored -> domainMetrics.githubPullRequestProcessed(processingTimer, PullRequestProcessingResult.UNLOCKS_COMMENTED))
-                            .then(accepted());
-                })
-                .doOnError(e -> {
-                    domainMetrics.githubPullRequestProcessed(processingTimer, PullRequestProcessingResult.ERROR);
-                    logger.error("Error previewing PR event for {}/{} #{}", owner, repo, prNumber, e);
-                })
-                .onErrorResume(ignored -> accepted());
-    }
-
-    private Mono<ResponseEntity<Void>> unlockMergedPullRequest(long installationId, String owner, String repo, int prNumber) {
-        var processingTimer = domainMetrics.startGithubPullRequestProcessing();
-
-        return githubClient.fetchPrCommits(installationId, owner, repo, prNumber)
-                .flatMap(commits -> {
-                    var filtered = commits.stream()
-                            .filter(c -> !c.author().userName().value().contains("[bot]"))
-                            .toList();
-                    domainMetrics.githubPullRequestCommits(commits.size(), commits.size() - filtered.size());
-                    return achievementsCommand.analyseCommits(filtered).collectList();
+                    var snapshot = new PullRequestSnapshot(
+                            OrganisationName.valueOf(owner),
+                            RepositoryName.valueOf(repo),
+                            prNumber,
+                            CommitId.valueOf(pullRequest.head().sha()),
+                            URI.create(pullRequest.htmlUrl() != null
+                                    ? pullRequest.htmlUrl()
+                                    : "https://github.com/%s/%s/pull/%d".formatted(owner, repo, prNumber))
+                    );
+                    var context = new PullRequestContext(recipient, snapshot, filtered, evidence.files());
+                    return achievementsCommand.analysePullRequest(context).collectList();
                 })
                 .flatMap(unlocks -> {
                     if (unlocks.isEmpty()) {
@@ -121,16 +135,6 @@ class GithubPullRequestWebhookHandler {
                 .onErrorResume(ignored -> accepted());
     }
 
-    private boolean shouldProcess(String action, boolean merged) {
-        if ("closed".equals(action)) {
-            return merged;
-        }
-        return "opened".equals(action) ||
-                "reopened".equals(action) ||
-                "synchronize".equals(action) ||
-                "ready_for_review".equals(action);
-    }
-
     private String invalidPayloadReason(EventPayload event, GithubPullRequestWebhookRequest request) {
         if (event.getNumber() == null) {
             return "missing pull request number";
@@ -147,7 +151,20 @@ class GithubPullRequestWebhookHandler {
         if (request.repository().owner().login() == null || request.repository().owner().login().isBlank()) {
             return "missing repository owner login";
         }
+        if (request.pullRequest() == null || request.pullRequest().user() == null) {
+            return "missing pull request author";
+        }
+        if (request.pullRequest().user().login() == null || request.pullRequest().user().login().isBlank()) {
+            return "missing pull request author login";
+        }
+        if (request.pullRequest().head() == null || request.pullRequest().head().sha() == null || request.pullRequest().head().sha().isBlank()) {
+            return "missing pull request head SHA";
+        }
         return null;
+    }
+
+    private boolean isBot(UserName userName) {
+        return userName.value().endsWith("[bot]");
     }
 
     private Long installationId(GithubPullRequestWebhookRequest request) {

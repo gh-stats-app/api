@@ -34,7 +34,7 @@ class ProfessionalPrideTest extends BaseAchievementTest {
         );
 
         //when
-        Optional<AchievementUnlocked> check = achievement.unlock(commits);
+        Optional<AchievementUnlocked> check = achievement.unlock(context(commits));
 
         //expect
         Assertions.assertTrue(check.isPresent());

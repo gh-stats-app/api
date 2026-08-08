@@ -3,12 +3,14 @@ package ghstats.api.services.github;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 record PrCommitResponse(
         @JsonProperty("sha") String sha,
         @JsonProperty("commit") CommitData commit,
         @JsonProperty("author") GitHubUser author,
-        @JsonProperty("html_url") String htmlUrl
+        @JsonProperty("html_url") String htmlUrl,
+        @JsonProperty("parents") List<ParentData> parents
 ) {
     record CommitData(
             @JsonProperty("message") String message,
@@ -22,6 +24,11 @@ record PrCommitResponse(
 
     record GitHubUser(
             @JsonProperty("login") String login
+    ) {
+    }
+
+    record ParentData(
+            @JsonProperty("sha") String sha
     ) {
     }
 }

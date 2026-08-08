@@ -1,6 +1,7 @@
 package ghstats.api.achievements.impl;
 
 import ghstats.api.achievements.api.AchievementUnlocked;
+import ghstats.api.achievements.api.PullRequestContext;
 import ghstats.api.integrations.github.api.GitCommit;
 import ghstats.api.achievements.api.UnlockableAchievement;
 import org.springframework.stereotype.Component;
@@ -29,12 +30,12 @@ class WindowsLanguage implements UnlockableAchievement {
     }
 
     @Override
-    public Optional<AchievementUnlocked> unlock(List<GitCommit> commits) {
-        return commits.stream()
-                .filter(it -> Stream.of(it.modified(), it.removed(), it.added())
-                        .flatMap(Collection::stream)
-                        .anyMatch(s -> s.endsWith(".bat") || s.endsWith(".ps1")))
-                .findAny()
-                .map(commit -> new AchievementUnlocked(this, commit));
+    public Optional<AchievementUnlocked> unlock(PullRequestContext context) {
+        boolean containsWindowsScript = context.files().stream()
+                .map(file -> file.filename())
+                .anyMatch(filename -> filename.endsWith(".bat") || filename.endsWith(".ps1"));
+        return containsWindowsScript
+                ? Optional.of(new AchievementUnlocked(this, context.recipient().userName(), context.triggerCommit()))
+                : Optional.empty();
     }
 }

@@ -1,6 +1,7 @@
 package ghstats.api.achievements.impl;
 
 import ghstats.api.achievements.api.AchievementUnlocked;
+import ghstats.api.achievements.api.PullRequestContext;
 import ghstats.api.achievements.api.UnlockableAchievement;
 import ghstats.api.integrations.github.api.GitCommit;
 import org.springframework.stereotype.Component;
@@ -32,12 +33,9 @@ class GoodBoy implements UnlockableAchievement {
     }
 
     @Override
-    public Optional<AchievementUnlocked> unlock(List<GitCommit> commits) {
-        return commits.stream()
-                .filter(it -> Stream.of(it.added())
-                        .flatMap(Collection::stream)
-                        .anyMatch(s -> PATTERN.matcher(s).find()))
-                .findAny()
-                .map(commit -> new AchievementUnlocked(this, commit));
+    public Optional<AchievementUnlocked> unlock(PullRequestContext context) {
+        return context.addedFiles().stream().anyMatch(filename -> PATTERN.matcher(filename).find())
+                ? Optional.of(new AchievementUnlocked(this, context.recipient().userName(), context.triggerCommit()))
+                : Optional.empty();
     }
 }

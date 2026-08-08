@@ -4,6 +4,7 @@ import ghstats.api.CommitBuilder;
 import ghstats.api.achievements.api.AchievementUnlocked;
 import ghstats.api.achievements.api.UnlockableAchievement;
 import ghstats.api.integrations.github.api.GitCommit;
+import ghstats.api.integrations.github.api.PullRequestFile;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -16,12 +17,15 @@ class ChangeOfMindTest extends BaseAchievementTest {
         //given
         UnlockableAchievement achievement = new ChangeOfMind();
         List<GitCommit> commits = List.of(
-                new CommitBuilder().withModified(List.of("file.yaml")).build(),
-                new CommitBuilder().withId("license-change").withModified(List.of("license.md")).build()
+                new CommitBuilder().build(),
+                new CommitBuilder().withId("license-change").build()
         );
 
         //when
-        Optional<AchievementUnlocked> check = achievement.unlock(commits);
+        Optional<AchievementUnlocked> check = achievement.unlock(context(
+                commits,
+                List.of(file("file.yaml", PullRequestFile.Status.MODIFIED), file("license.md", PullRequestFile.Status.MODIFIED))
+        ));
 
         //expect
         Assertions.assertTrue(check.isPresent());

@@ -1,6 +1,7 @@
 package ghstats.api.achievements.impl;
 
 import ghstats.api.achievements.api.AchievementUnlocked;
+import ghstats.api.achievements.api.PullRequestContext;
 import ghstats.api.achievements.api.UnlockableAchievement;
 import ghstats.api.integrations.github.api.GitCommit;
 import org.springframework.stereotype.Component;
@@ -29,12 +30,9 @@ class WellRewriteThatLater implements UnlockableAchievement {
     }
 
     @Override
-    public Optional<AchievementUnlocked> unlock(List<GitCommit> commits) {
-        return commits.stream()
-                .filter(it -> Stream.of(it.added())
-                        .flatMap(Collection::stream)
-                        .anyMatch(s -> s.endsWith(".sh") || s.endsWith(".bash")))
-                .findAny()
-                .map(commit -> new AchievementUnlocked(this, commit));
+    public Optional<AchievementUnlocked> unlock(PullRequestContext context) {
+        return context.addedFiles().stream().anyMatch(filename -> filename.endsWith(".sh") || filename.endsWith(".bash"))
+                ? Optional.of(new AchievementUnlocked(this, context.recipient().userName(), context.triggerCommit()))
+                : Optional.empty();
     }
 }

@@ -1,6 +1,7 @@
 package ghstats.api.achievements.impl;
 
 import ghstats.api.achievements.api.AchievementUnlocked;
+import ghstats.api.achievements.api.PullRequestContext;
 import ghstats.api.achievements.api.UnlockableAchievement;
 import ghstats.api.integrations.github.api.GitCommit;
 import org.springframework.stereotype.Component;
@@ -38,10 +39,11 @@ class HelloLinus implements UnlockableAchievement {
     }
 
     @Override
-    public Optional<AchievementUnlocked> unlock(List<GitCommit> commits) {
+    public Optional<AchievementUnlocked> unlock(PullRequestContext context) {
+        List<GitCommit> commits = context.commits();
         return commits.stream()
                 .filter(it -> SWEAR_PATTERN.matcher(it.message()).results().count() >= 5)
                 .findFirst()
-                .map(commit -> new AchievementUnlocked(this, commit));
+                .map(commit -> new AchievementUnlocked(this, context.recipient().userName(), commit));
     }
 }

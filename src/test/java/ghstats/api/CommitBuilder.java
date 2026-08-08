@@ -18,9 +18,7 @@ public class CommitBuilder {
     private String authorUserEmail = UUID.randomUUID() + "@example.com";
     private String message = UUID.randomUUID().toString();
     private ZonedDateTime timestamp = ZonedDateTime.now(ZoneId.systemDefault());
-    private List<String> added = List.of();
-    private List<String> removed = List.of();
-    private List<String> modified = List.of();
+    private List<CommitId> parents = List.of();
     private String url = "https://github.com";
     private GitCommit.PushMetadata pushMetadata = new GitCommit.PushMetadata(false, "refs/heads/" + UUID.randomUUID());
 
@@ -49,18 +47,8 @@ public class CommitBuilder {
         return this;
     }
 
-    public CommitBuilder withAdded(List<String> added) {
-        this.added = added;
-        return this;
-    }
-
-    public CommitBuilder withModified(List<String> modified) {
-        this.modified = modified;
-        return this;
-    }
-
-    public CommitBuilder withRemoved(List<String> removed) {
-        this.removed = removed;
+    public CommitBuilder withParents(List<CommitId> parents) {
+        this.parents = parents;
         return this;
     }
 
@@ -84,9 +72,7 @@ public class CommitBuilder {
                 ),
                 this.message,
                 this.timestamp,
-                this.added,
-                this.removed,
-                this.modified,
+                this.parents,
                 URI.create(url),
                 this.pushMetadata
         );

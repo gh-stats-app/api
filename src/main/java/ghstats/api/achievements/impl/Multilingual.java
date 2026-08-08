@@ -1,6 +1,7 @@
 package ghstats.api.achievements.impl;
 
 import ghstats.api.achievements.api.AchievementUnlocked;
+import ghstats.api.achievements.api.PullRequestContext;
 import ghstats.api.achievements.api.UnlockableAchievement;
 import ghstats.api.integrations.github.api.GitCommit;
 import org.springframework.stereotype.Component;
@@ -37,18 +38,15 @@ class Multilingual implements UnlockableAchievement {
     }
 
     @Override
-    public Optional<AchievementUnlocked> unlock(List<GitCommit> commits) {
-        return commits.stream()
-                .filter(it -> {
-                    Set<String> languages = Stream.of(it.added(), it.modified())
-                            .flatMap(Collection::stream)
-                            .map(this::getExtension)
-                            .filter(LANGUAGE_EXTENSIONS::contains)
-                            .collect(Collectors.toSet());
-                    return languages.size() >= 3;
-                })
-                .findAny()
-                .map(commit -> new AchievementUnlocked(this, commit));
+    public Optional<AchievementUnlocked> unlock(PullRequestContext context) {
+        Set<String> languages = Stream.of(context.addedFiles(), context.modifiedFiles())
+                .flatMap(Collection::stream)
+                .map(this::getExtension)
+                .filter(LANGUAGE_EXTENSIONS::contains)
+                .collect(Collectors.toSet());
+        return languages.size() >= 3
+                ? Optional.of(new AchievementUnlocked(this, context.recipient().userName(), context.triggerCommit()))
+                : Optional.empty();
     }
 
     private String getExtension(String filename) {

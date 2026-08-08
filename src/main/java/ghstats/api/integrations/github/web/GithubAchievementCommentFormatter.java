@@ -11,22 +11,13 @@ class GithubAchievementCommentFormatter {
 
     static final String COMMENT_MARKER = "<!-- gh-stats-achievements -->";
 
-    String formatPreview(String userName) {
-        return """
-                %s
-                ## Achievement Pending
-
-                @%s, this PR looks like it will unlock an achievement when merged.
-                """.formatted(COMMENT_MARKER, userName);
-    }
-
     String format(List<AchievementUnlocked> unlocks) {
         String rows = unlocks.stream()
                 .map(u -> "| ![](https://api.gh-stats.app/img/%s.png) | **%s** - %s | @%s |".formatted(
                         u.achievement().getId(),
                         u.achievement().getName(),
                         u.achievement().getDescription(),
-                        u.commit().author().userName().value()))
+                        u.recipient().value()))
                 .collect(Collectors.joining("\n"));
 
         return """

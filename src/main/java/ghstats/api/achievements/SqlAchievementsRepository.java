@@ -25,7 +25,7 @@ class SqlAchievementsRepository implements AchievementsRepository {
     @Override
     public Mono<Long> saveAchievementUnlock(AchievementUnlocked achievementUnlocked) {
         return databaseClient.sql("INSERT INTO achievements_unlocked (\"user\", commit_id, url, achievement_id) VALUES ($1, $2, $3, $4) ON CONFLICT (\"user\", achievement_id) DO NOTHING")
-                .bind("$1", achievementUnlocked.commit().author().userName().value())
+                .bind("$1", achievementUnlocked.recipient().value())
                 .bind("$2", achievementUnlocked.commit().id().value())
                 .bind("$3", achievementUnlocked.commit().url().toString())
                 .bind("$4", achievementUnlocked.achievement().getId())

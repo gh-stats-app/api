@@ -5,6 +5,8 @@ import ghstats.api.services.github.GithubClient;
 import ghstats.api.integrations.github.api.CommitAuthor;
 import ghstats.api.integrations.github.api.CommitId;
 import ghstats.api.integrations.github.api.GitCommit;
+import ghstats.api.integrations.github.api.PullRequestEvidence;
+import ghstats.api.integrations.github.api.PullRequestFile;
 import ghstats.api.integrations.github.api.UserEmail;
 import ghstats.api.integrations.github.api.UserName;
 import io.micrometer.core.instrument.Counter;
@@ -41,15 +43,18 @@ class GithubEventsApiTest extends BaseIntegrationTest {
         double unlocksBefore = counterValue("ghstats.achievements.unlocks", "achievement", "fix", "result", "created");
         var commit = new GitCommit(
                 CommitId.valueOf("abc123"),
-                new CommitAuthor(UserName.valueOf("bgalek"), UserEmail.valueOf("bartosz@email.local")),
+                new CommitAuthor(UserName.valueOf("contributor"), UserEmail.valueOf("contributor@email.local")),
                 "fix: something",
                 ZonedDateTime.now(ZoneId.systemDefault()),
-                List.of(), List.of(), List.of("wow.txt"),
+                List.of(),
                 URI.create("https://github.com/bgalek/gh-events-test/commit/abc123"),
                 new GitCommit.PushMetadata(false, "refs/pull/1/merge")
         );
-        Mockito.when(githubClient.fetchPrCommits(12345L, "bgalek", "gh-events-test", 1))
-                .thenReturn(Mono.just(List.of(commit)));
+        Mockito.when(githubClient.fetchPullRequestEvidence(12345L, "bgalek", "gh-events-test", 1))
+                .thenReturn(Mono.just(new PullRequestEvidence(
+                        List.of(commit),
+                        List.of(new PullRequestFile("wow.txt", PullRequestFile.Status.MODIFIED, 1, 0, 1, null, null))
+                )));
         Mockito.when(githubClient.createOrUpdatePrComment(Mockito.eq(12345L), Mockito.eq("bgalek"), Mockito.eq("gh-events-test"), Mockito.eq(1), Mockito.anyString()))
                 .thenReturn(Mono.empty());
 
@@ -66,6 +71,62 @@ class GithubEventsApiTest extends BaseIntegrationTest {
                 .isEqualTo(processedBefore + 1);
         assertThat(counterValue("ghstats.achievements.unlocks", "achievement", "fix", "result", "created"))
                 .isEqualTo(unlocksBefore + 1);
+        Mockito.verify(githubClient).createOrUpdatePrComment(
+                Mockito.eq(12345L),
+                Mockito.eq("bgalek"),
+                Mockito.eq("gh-events-test"),
+                Mockito.eq(1),
+                Mockito.argThat(comment -> comment.contains("@bgalek") && !comment.contains("@contributor"))
+        );
+    }
+
+    @Test
+    @DisplayName("should ignore merged PR authored by a bot")
+    void testBotAuthoredMergedPrEvent() {
+        String botEvent = mergedPrEvent
+                .replaceFirst("\"login\": \"bgalek\"", "\"login\": \"dependabot[bot]\"")
+                .replaceFirst("\"type\": \"User\"", "\"type\": \"Bot\"");
+
+        webClient.post()
+                .uri("/integrations/github/events")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(botEvent)
+                .exchange()
+                .expectStatus()
+                .isAccepted();
+
+        Mockito.verifyNoInteractions(githubClient);
+    }
+
+    @Test
+    @DisplayName("should ignore bot commits in a human-authored PR")
+    void testBotCommitsIgnored() {
+        var botCommit = new GitCommit(
+                CommitId.valueOf("abc123"),
+                new CommitAuthor(UserName.valueOf("dependabot[bot]"), UserEmail.valueOf("bot@users.noreply.github.com")),
+                "fix: dependency",
+                ZonedDateTime.now(ZoneId.systemDefault()),
+                List.of(),
+                URI.create("https://github.com/bgalek/gh-events-test/commit/abc123"),
+                new GitCommit.PushMetadata(false, "refs/pull/1/merge")
+        );
+        Mockito.when(githubClient.fetchPullRequestEvidence(12345L, "bgalek", "gh-events-test", 1))
+                .thenReturn(Mono.just(new PullRequestEvidence(
+                        List.of(botCommit),
+                        List.of(new PullRequestFile("dependency.txt", PullRequestFile.Status.MODIFIED, 1, 1, 2, null, null))
+                )));
+
+        webClient.post()
+                .uri("/integrations/github/events")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(mergedPrEvent)
+                .exchange()
+                .expectStatus()
+                .isAccepted();
+
+        Mockito.verify(githubClient, Mockito.never()).createOrUpdatePrComment(
+                Mockito.anyLong(), Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), Mockito.anyString()
+        );
     }
 
     @Test
@@ -144,24 +205,8 @@ class GithubEventsApiTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("should preview opened PR event before it is closed")
+    @DisplayName("should ignore opened PR event")
     void testOpenedPrEvent() {
-        double processedBefore = counterValue("ghstats.github.pull_request.processed", "result", "unlocks_commented");
-        double unlocksBefore = counterValue("ghstats.achievements.unlocks", "achievement", "windows-language", "result", "created");
-        var commit = new GitCommit(
-                CommitId.valueOf("aae355515b40af70839312d928a1fc9a5c4f148e"),
-                new CommitAuthor(UserName.valueOf("bgalek"), UserEmail.valueOf("bartosz@email.local")),
-                "Add echo command to test2.bat",
-                ZonedDateTime.now(ZoneId.systemDefault()),
-                List.of("test2.bat"), List.of(), List.of(),
-                URI.create("https://github.com/gh-stats-app/test-repository/commit/aae355515b40af70839312d928a1fc9a5c4f148e"),
-                new GitCommit.PushMetadata(false, "refs/pull/2/merge")
-        );
-        Mockito.when(githubClient.fetchPrCommits(12345L, "gh-stats-app", "test-repository", 2))
-                .thenReturn(Mono.just(List.of(commit)));
-        Mockito.when(githubClient.createOrUpdatePrComment(Mockito.eq(12345L), Mockito.eq("gh-stats-app"), Mockito.eq("test-repository"), Mockito.eq(2), Mockito.anyString()))
-                .thenReturn(Mono.empty());
-
         webClient.post()
                 .uri("/integrations/github/events")
                 .header("X-GitHub-Event", "pull_request")
@@ -171,20 +216,7 @@ class GithubEventsApiTest extends BaseIntegrationTest {
                 .expectStatus()
                 .isAccepted();
 
-        Mockito.verify(githubClient).createOrUpdatePrComment(
-                Mockito.eq(12345L),
-                Mockito.eq("gh-stats-app"),
-                Mockito.eq("test-repository"),
-                Mockito.eq(2),
-                Mockito.argThat(comment -> comment.contains("Achievement Pending")
-                        && comment.contains("@bgalek")
-                        && !comment.contains("windows-language")
-                        && !comment.contains("Achievements Unlocked"))
-        );
-        assertThat(counterValue("ghstats.github.pull_request.processed", "result", "unlocks_commented"))
-                .isEqualTo(processedBefore + 1);
-        assertThat(counterValue("ghstats.achievements.unlocks", "achievement", "windows-language", "result", "created"))
-                .isEqualTo(unlocksBefore);
+        Mockito.verifyNoInteractions(githubClient);
     }
 
     @Test
@@ -239,7 +271,14 @@ class GithubEventsApiTest extends BaseIntegrationTest {
                 "number": 1,
                 "pull_request": {
                     "merged": true,
-                    "html_url": "https://github.com/bgalek/gh-events-test/pull/1"
+                    "html_url": "https://github.com/bgalek/gh-events-test/pull/1",
+                    "user": {
+                        "login": "bgalek",
+                        "type": "User"
+                    },
+                    "head": {
+                        "sha": "abc123"
+                    }
                 },
                 "repository": {
                     "name": "gh-events-test",
@@ -330,7 +369,14 @@ class GithubEventsApiTest extends BaseIntegrationTest {
                 "number": 2,
                 "pull_request": {
                     "merged": false,
-                    "html_url": "https://github.com/gh-stats-app/test-repository/pull/2"
+                    "html_url": "https://github.com/gh-stats-app/test-repository/pull/2",
+                    "user": {
+                        "login": "bgalek",
+                        "type": "User"
+                    },
+                    "head": {
+                        "sha": "aae355515b40af70839312d928a1fc9a5c4f148e"
+                    }
                 },
                 "repository": {
                     "name": "test-repository",
@@ -351,11 +397,18 @@ class GithubEventsApiTest extends BaseIntegrationTest {
 
     String openedPrEventWithoutInstallation = """
             {
-                "action": "opened",
+                "action": "closed",
                 "number": 2,
                 "pull_request": {
-                    "merged": false,
-                    "html_url": "https://github.com/gh-stats-app/test-repository/pull/2"
+                    "merged": true,
+                    "html_url": "https://github.com/gh-stats-app/test-repository/pull/2",
+                    "user": {
+                        "login": "bgalek",
+                        "type": "User"
+                    },
+                    "head": {
+                        "sha": "aae355515b40af70839312d928a1fc9a5c4f148e"
+                    }
                 },
                 "repository": {
                     "name": "test-repository",

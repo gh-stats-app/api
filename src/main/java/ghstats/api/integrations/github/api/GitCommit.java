@@ -9,12 +9,14 @@ public record GitCommit(
         CommitAuthor author,
         String message,
         ZonedDateTime timestamp,
-        List<String> added,
-        List<String> removed,
-        List<String> modified,
+        List<CommitId> parents,
         URI url,
         PushMetadata pushMetadata
 ) {
+    public GitCommit {
+        parents = List.copyOf(parents);
+    }
+
     public record PushMetadata(
             Boolean forced,
             String ref

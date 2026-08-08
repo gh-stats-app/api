@@ -24,7 +24,11 @@ class UsersApiTest extends BaseIntegrationTest {
         // given
         GitCommit commit = new CommitBuilder().build();
         UnlockableAchievement achievement = achievements.getFirst();
-        achievementsRepository.saveAchievementUnlock(new AchievementUnlocked(achievement, commit)).block();
+        achievementsRepository.saveAchievementUnlock(new AchievementUnlocked(
+                achievement,
+                commit.author().userName(),
+                commit
+        )).block();
 
         // expect
         webClient.get()
