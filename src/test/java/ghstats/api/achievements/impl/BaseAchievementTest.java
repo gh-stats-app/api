@@ -76,4 +76,16 @@ abstract class BaseAchievementTest {
                 null
         );
     }
+
+    PullRequestFile patchedFile(String filename, int additions, int deletions, String patch) {
+        return new PullRequestFile(
+                filename,
+                PullRequestFile.Status.MODIFIED,
+                additions,
+                deletions,
+                additions + deletions,
+                null,
+                patch
+        );
+    }
 }
