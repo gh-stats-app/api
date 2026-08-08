@@ -2,14 +2,14 @@
 spring-boot = "4.1.0"
 spring-dependency-management = "1.1.7"
 test-logger = "4.0.0"
-error-prone = "4.3.0"
-error-prone-core = "2.43.0"
+error-prone = "5.1.0"
+error-prone-core = "2.50.0"
 micrometer = "latest.release"
 guava = "33.5.0-jre"
-slugify = "3.0.7"
+slugify = "4.0.1"
 prettytime = "5.0.9.Final"
 emoji-java = "5.1.1"
-archunit = "1.4.1"
+archunit = "1.5.0"
 testcontainers = "1.21.4"
 
 [libraries]
