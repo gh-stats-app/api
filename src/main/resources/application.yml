@@ -8,10 +8,18 @@ app:
 spring:
   application:
     name: gh-stats-api
+  main:
+    lazy-initialization: true
   r2dbc:
     url: r2dbc:postgresql://${app.db.host-and-db}?${app.db.options}
     username: ${app.db.username}
     password: ${app.db.password}
+    pool:
+      enabled: true
+      initial-size: 0
+      max-size: 5
+      max-idle-time: 30s
+      max-life-time: 10m
   flyway:
     url: jdbc:postgresql://${app.db.host-and-db}?${app.db.options}
     user: ${app.db.username}

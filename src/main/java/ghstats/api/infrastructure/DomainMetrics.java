@@ -26,6 +26,14 @@ public class DomainMetrics {
         meterRegistry.counter("ghstats.github.webhook.skipped", "reason", reason.tag).increment();
     }
 
+    public void githubInstallationEvent(String action, String result) {
+        meterRegistry.counter(
+                "ghstats.github.installation.events",
+                "action", installationAction(action),
+                "result", result
+        ).increment();
+    }
+
     public Timer.Sample startGithubPullRequestProcessing() {
         return Timer.start(meterRegistry);
     }
@@ -81,13 +89,17 @@ public class DomainMetrics {
         if ("ping".equals(action)) {
             return "ping";
         }
-        if ("push".equals(action)) {
-            return "push";
-        }
         if (action == null || action.isBlank()) {
             return "missing";
         }
         return "other";
+    }
+
+    private String installationAction(String action) {
+        return switch (action) {
+            case "created", "deleted", "suspend", "unsuspend", "new_permissions_accepted" -> action;
+            default -> "other";
+        };
     }
 
     public enum WebhookSkipReason {
@@ -95,6 +107,7 @@ public class DomainMetrics {
         NOT_MERGED("not_merged"),
         MISSING_INSTALLATION("missing_installation"),
         UNSUPPORTED_EVENT("unsupported_event"),
+        UNSUPPORTED_ACTION("unsupported_action"),
         INVALID_PAYLOAD("invalid_payload"),
         INVALID_SIGNATURE("invalid_signature");
 

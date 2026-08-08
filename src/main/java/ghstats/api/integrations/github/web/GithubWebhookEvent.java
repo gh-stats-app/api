@@ -2,8 +2,8 @@ package ghstats.api.integrations.github.web;
 
 enum GithubWebhookEvent {
     PING("ping"),
+    INSTALLATION("installation"),
     PULL_REQUEST("pull_request"),
-    PUSH("push"),
     UNSUPPORTED("");
 
     final String header;

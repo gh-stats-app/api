@@ -1,7 +1,6 @@
 package ghstats.api.integrations.github.web;
 
 import com.github.bgalek.github.dotcom.models.EventPayload;
-import com.google.common.base.Splitter;
 import ghstats.api.infrastructure.DomainMetrics;
 import ghstats.api.infrastructure.DomainMetrics.WebhookSkipReason;
 import org.slf4j.Logger;
@@ -14,26 +13,26 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-
 @Component
 class GithubWebhookProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(GithubWebhookProcessor.class);
 
     private final DomainMetrics domainMetrics;
+    private final GithubInstallationWebhookHandler installationHandler;
     private final GithubPullRequestWebhookHandler pullRequestHandler;
     private final GithubWebhookSignatureVerifier signatureVerifier;
     private final ObjectMapper objectMapper;
 
     GithubWebhookProcessor(
             DomainMetrics domainMetrics,
+            GithubInstallationWebhookHandler installationHandler,
             GithubPullRequestWebhookHandler pullRequestHandler,
             GithubWebhookSignatureVerifier signatureVerifier,
             ObjectMapper objectMapper
     ) {
         this.domainMetrics = domainMetrics;
+        this.installationHandler = installationHandler;
         this.pullRequestHandler = pullRequestHandler;
         this.signatureVerifier = signatureVerifier;
         this.objectMapper = objectMapper;
@@ -45,34 +44,14 @@ class GithubWebhookProcessor {
             logger.warn("Rejecting GitHub webhook event '{}' with invalid signature", headers.event());
             return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
         }
-        return switch (GithubWebhookEvent.fromHeader(headers.event())) {
-            case PING -> handlePing();
-            case PULL_REQUEST -> handlePullRequestPayload(payload);
-            case PUSH -> handleUnsupported(GithubWebhookEvent.PUSH.header);
-            case UNSUPPORTED -> handleUnsupported(headers.event());
-        };
+        return handleEvent(headers, payload);
     }
 
-    Mono<ResponseEntity<Void>> handleForm(GithubWebhookHeaders headers, String body) {
-        if (!signatureVerifier.isValid(body, headers.signature256())) {
-            domainMetrics.githubWebhookSkipped(WebhookSkipReason.INVALID_SIGNATURE);
-            logger.warn("Rejecting GitHub webhook form event '{}' with invalid signature", headers.event());
-            return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
-        }
-
-        String payload = formValue(body, "payload");
-        if (payload == null || payload.isBlank()) {
-            logger.warn("Ignoring GitHub webhook form request without payload");
-            return accepted();
-        }
-        return handleVerified(headers, payload);
-    }
-
-    private Mono<ResponseEntity<Void>> handleVerified(GithubWebhookHeaders headers, String payload) {
+    private Mono<ResponseEntity<Void>> handleEvent(GithubWebhookHeaders headers, String payload) {
         return switch (GithubWebhookEvent.fromHeader(headers.event())) {
             case PING -> handlePing();
+            case INSTALLATION -> handleInstallationPayload(payload, headers.deliveryId());
             case PULL_REQUEST -> handlePullRequestPayload(payload);
-            case PUSH -> handleUnsupported(GithubWebhookEvent.PUSH.header);
             case UNSUPPORTED -> handleUnsupported(headers.event());
         };
     }
@@ -101,6 +80,15 @@ class GithubWebhookProcessor {
         }
     }
 
+    private Mono<ResponseEntity<Void>> handleInstallationPayload(String payload, String deliveryId) {
+        try {
+            var request = objectMapper.readValue(payload, GithubInstallationWebhookRequest.class);
+            return installationHandler.handle(request, deliveryId);
+        } catch (JacksonException e) {
+            return invalid(e.getMessage(), e);
+        }
+    }
+
     private Mono<ResponseEntity<Void>> invalid(String reason, Exception e) {
         domainMetrics.githubWebhookSkipped(WebhookSkipReason.INVALID_PAYLOAD);
         logger.warn("Ignoring GitHub webhook with invalid payload: {}", reason);
@@ -112,19 +100,4 @@ class GithubWebhookProcessor {
         return Mono.just(ResponseEntity.accepted().build());
     }
 
-    private String formValue(String body, String name) {
-        if (body == null || body.isBlank()) {
-            return null;
-        }
-        for (String part : Splitter.on('&').split(body)) {
-            int separator = part.indexOf('=');
-            String rawName = separator >= 0 ? part.substring(0, separator) : part;
-            String rawValue = separator >= 0 ? part.substring(separator + 1) : "";
-            String decodedName = URLDecoder.decode(rawName, StandardCharsets.UTF_8);
-            if (name.equals(decodedName)) {
-                return URLDecoder.decode(rawValue, StandardCharsets.UTF_8);
-            }
-        }
-        return null;
-    }
 }

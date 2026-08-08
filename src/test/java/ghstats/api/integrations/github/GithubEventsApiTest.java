@@ -69,39 +69,6 @@ class GithubEventsApiTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("should process merged PR event sent as form payload")
-    void testMergedPrFormEvent() {
-        // given
-        double processedBefore = counterValue("ghstats.github.pull_request.processed", "result", "unlocks_commented");
-        var commit = new GitCommit(
-                CommitId.valueOf("def456"),
-                new CommitAuthor(UserName.valueOf("bgalek"), UserEmail.valueOf("bartosz@email.local")),
-                "fix: form payload",
-                ZonedDateTime.now(ZoneId.systemDefault()),
-                List.of(), List.of(), List.of("form.txt"),
-                URI.create("https://github.com/bgalek/gh-events-test/commit/def456"),
-                new GitCommit.PushMetadata(false, "refs/pull/1/merge")
-        );
-        Mockito.when(githubClient.fetchPrCommits(12345L, "bgalek", "gh-events-test", 1))
-                .thenReturn(Mono.just(List.of(commit)));
-        Mockito.when(githubClient.createOrUpdatePrComment(Mockito.eq(12345L), Mockito.eq("bgalek"), Mockito.eq("gh-events-test"), Mockito.eq(1), Mockito.anyString()))
-                .thenReturn(Mono.empty());
-
-        // expect
-        webClient.post()
-                .uri("/integrations/github/events")
-                .header("X-GitHub-Event", "pull_request")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body(BodyInserters.fromFormData("payload", mergedPrEvent))
-                .exchange()
-                .expectStatus()
-                .isAccepted();
-
-        assertThat(counterValue("ghstats.github.pull_request.processed", "result", "unlocks_commented"))
-                .isEqualTo(processedBefore + 1);
-    }
-
-    @Test
     @DisplayName("should skip non-merged PR event")
     void testNonMergedPrEvent() {
         double skippedBefore = counterValue("ghstats.github.webhook.skipped", "reason", "not_merged");
@@ -120,15 +87,15 @@ class GithubEventsApiTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("should accept GitHub ping sent as form payload")
-    void testPingFormEvent() {
+    @DisplayName("should accept GitHub ping")
+    void testPingEvent() {
         double skippedBefore = counterValue("ghstats.github.webhook.skipped", "reason", "ping");
 
         webClient.post()
                 .uri("/integrations/github/events")
                 .header("X-GitHub-Event", "ping")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body(BodyInserters.fromFormData("payload", pingEvent))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(pingEvent)
                 .exchange()
                 .expectStatus()
                 .isAccepted();
@@ -158,8 +125,8 @@ class GithubEventsApiTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("should ignore push event")
-    void testPushEventIgnored() {
+    @DisplayName("should treat push as an unsupported event")
+    void testPushEventUnsupported() {
         double skippedBefore = counterValue("ghstats.github.webhook.skipped", "reason", "unsupported_event");
 
         webClient.post()
