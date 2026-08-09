@@ -8,15 +8,21 @@ import ghstats.api.integrations.github.api.PullRequestFile;
 import ghstats.api.integrations.github.api.UserEmail;
 import ghstats.api.integrations.github.api.UserName;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class GithubClient {
 
     private static final String COMMENT_MARKER = "<!-- gh-stats-achievements -->";
+    private static final Pattern NEXT_PAGE_LINK = Pattern.compile("<([^>]+)>;\\s*rel=\"next\"");
 
     private final WebClient webClient;
     private final GithubAppAuthenticator authenticator;
@@ -29,17 +35,19 @@ public class GithubClient {
     public Mono<PullRequestEvidence> fetchPullRequestEvidence(long installationId, String owner, String repo, int prNumber) {
         return authenticator.installationToken(installationId)
                 .flatMap(token -> {
-                    Mono<List<PrCommitResponse>> commitsMono = webClient.get()
-                            .uri("/repos/{owner}/{repo}/pulls/{number}/commits?per_page=100", owner, repo, prNumber)
-                            .headers(headers -> headers.setBearerAuth(token))
-                            .retrieve()
-                            .bodyToMono(new ParameterizedTypeReference<>() {});
+                    Mono<List<PrCommitResponse>> commitsMono = fetchAllPages(
+                            token,
+                            "/repos/%s/%s/pulls/%d/commits?per_page=100".formatted(owner, repo, prNumber),
+                            new ParameterizedTypeReference<>() {
+                            }
+                    );
 
-                    Mono<List<PullRequestFileResponse>> filesMono = webClient.get()
-                            .uri("/repos/{owner}/{repo}/pulls/{number}/files?per_page=100", owner, repo, prNumber)
-                            .headers(headers -> headers.setBearerAuth(token))
-                            .retrieve()
-                            .bodyToMono(new ParameterizedTypeReference<>() {});
+                    Mono<List<PullRequestFileResponse>> filesMono = fetchAllPages(
+                            token,
+                            "/repos/%s/%s/pulls/%d/files?per_page=100".formatted(owner, repo, prNumber),
+                            new ParameterizedTypeReference<>() {
+                            }
+                    );
 
                     return Mono.zip(commitsMono, filesMono)
                             .map(tuple -> {
@@ -52,6 +60,49 @@ public class GithubClient {
                                 return new PullRequestEvidence(commits, files);
                             });
                 });
+    }
+
+    private <T> Mono<List<T>> fetchAllPages(
+            String token,
+            String uri,
+            ParameterizedTypeReference<List<T>> bodyType
+    ) {
+        return webClient.get()
+                .uri(uri)
+                .headers(headers -> headers.setBearerAuth(token))
+                .exchangeToMono(response -> {
+                    if (response.statusCode().isError()) {
+                        return response.createError();
+                    }
+                    Optional<String> nextPage = nextPage(response.headers().header(HttpHeaders.LINK));
+                    return response.bodyToMono(bodyType)
+                            .defaultIfEmpty(List.of())
+                            .flatMap(page -> nextPage
+                                    .map(next -> fetchAllPages(token, next, bodyType)
+                                            .map(remaining -> concatenate(page, remaining)))
+                                    .orElseGet(() -> Mono.just(page)));
+                });
+    }
+
+    private static Optional<String> nextPage(List<String> linkHeaders) {
+        for (String header : linkHeaders) {
+            Matcher matcher = NEXT_PAGE_LINK.matcher(header);
+            if (matcher.find()) {
+                URI uri = URI.create(matcher.group(1));
+                if (!uri.isAbsolute() || "api.github.com".equalsIgnoreCase(uri.getHost())) {
+                    return Optional.of(uri.toString());
+                }
+                throw new IllegalStateException("Refusing to send a GitHub token to pagination host " + uri.getHost());
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static <T> List<T> concatenate(List<T> page, List<T> remaining) {
+        List<T> combined = new ArrayList<>(page.size() + remaining.size());
+        combined.addAll(page);
+        combined.addAll(remaining);
+        return List.copyOf(combined);
     }
 
     public Mono<Void> createOrUpdatePrComment(long installationId, String owner, String repo, int prNumber, String body) {
