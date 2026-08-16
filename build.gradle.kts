@@ -26,7 +26,7 @@ dependencies {
     implementation(libs.slugify)
     implementation(libs.prettytime)
     implementation(libs.emoji.java)
-    implementation("org.wickedsource:diffparser:1.0")
+    implementation("org.wickedsource:diffparser:1.2")
     implementation("org.springframework.boot:spring-boot-starter-flyway")
     implementation(libs.flyway.database.postgresql)
     implementation("com.github.bgalek.github:github-models-dotcom:0.0.25")
