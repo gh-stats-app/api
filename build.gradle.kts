@@ -29,7 +29,7 @@ dependencies {
     implementation("org.wickedsource:diffparser:1.0")
     implementation("org.springframework.boot:spring-boot-starter-flyway")
     implementation(libs.flyway.database.postgresql)
-    implementation("com.github.bgalek.github:github-models-dotcom:0.0.25")
+    implementation("com.github.bgalek.github:github-models-dotcom:0.0.34")
 
     runtimeOnly(libs.spring.boot.starter.jdbc)
     runtimeOnly(libs.postgresql)
