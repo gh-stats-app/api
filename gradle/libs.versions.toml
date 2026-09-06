@@ -2,7 +2,7 @@
 spring-boot = "4.1.1"
 spring-dependency-management = "1.1.7"
 test-logger = "4.0.0"
-error-prone = "5.1.0"
+error-prone = "5.1.1"
 error-prone-core = "2.50.0"
 micrometer = "latest.release"
 guava = "33.6.0-jre"
